@@ -13,7 +13,7 @@ License : GPL v3
 
 ## What's an this project? ##
 
-![Alt Text](../VST_GLSL_0133.gif)
+![Alt Text](VST_GLSL_0133.gif)
 
 ## Building ##
 
