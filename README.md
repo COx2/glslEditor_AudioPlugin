@@ -13,6 +13,8 @@ License : GPL v3
 
 ## What's an this project? ##
 
+![Alt Text](../VST_GLSL_0133.gif)
+
 ## Building ##
 
 So I've built under Windows and Mac OS X.
