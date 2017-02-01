@@ -33,10 +33,12 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	fragmentDocument.addListener(this);
 
 	addAndMakeVisible(m_statusLabel);
-	m_statusLabel.setJustificationType(Justification::centredLeft);
+	m_statusLabel.setJustificationType(Justification::topLeft);
 	m_statusLabel.setColour(Label::backgroundColourId, Colours::darkcyan);
 	m_statusLabel.setColour(Label::textColourId, Colours::white);
 	m_statusLabel.setFont(Font(14.0f));
+
+	startTimer(30);
 }
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()
@@ -57,24 +59,51 @@ void GlslplugInAudioProcessorEditor::resized()
     // subcomponents in your editor..
 	m_GLSLCompo.setBounds(0, 0, 800, 600);
 
-	fragmentEditorComp.setBounds(0, 600, 800, 380);
+	fragmentEditorComp.setBounds(0, 600, 800, 340);
 
-	m_statusLabel.setBounds(0, 980, 800, 20);
+	m_statusLabel.setBounds(0, 940, 800, 60);
 }
 
 //==============================================================================
 void GlslplugInAudioProcessorEditor::timerCallback()
 {
-	stopTimer();
-	m_GLSLCompo.setShaderProgramFragment(fragmentDocument.getAllContent());
+	if (isNeedShaderCompile) {
+		stopTimer();
+		m_GLSLCompo.setShaderProgramFragment(fragmentDocument.getAllContent());
+		startTimer(30);
+	}
+
+	if (!m_midiCCqueue.empty()) {
+		sendMidiCCValue();
+	}
 }
 
 void GlslplugInAudioProcessorEditor::codeDocumentTextInserted(const String& /*newText*/, int /*insertIndex*/)
 {
 	startTimer(shaderLinkDelay);
+	isNeedShaderCompile = true;
 }
 
 void GlslplugInAudioProcessorEditor::codeDocumentTextDeleted(int /*startIndex*/, int /*endIndex*/)
 {
 	startTimer(shaderLinkDelay);
+	isNeedShaderCompile = true;
+}
+
+void GlslplugInAudioProcessorEditor::setMidiCCValue(juce::MidiMessage midiCC)
+{
+	m_midiCCqueue.push(midiCC);
+}
+
+void GlslplugInAudioProcessorEditor::sendMidiCCValue()
+{
+	while (!m_midiCCqueue.empty())
+	{
+		juce::MidiMessage midiCC = m_midiCCqueue.front();
+		m_midiCCqueue.pop();
+		m_GLSLCompo.setMidiCCValue(midiCC.getControllerNumber(), midiCC.getControllerValue());
+		//auto cText = m_statusLabel.getText();
+		//cText += " /" + String(midiCC.getControllerNumber()) + "-" + String(midiCC.getControllerValue());
+		//m_statusLabel.setText(cText, dontSendNotification);
+	}
 }

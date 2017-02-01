@@ -14,6 +14,8 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
 #include "GLSLComponent.h"
+
+#include <queue>
 //==============================================================================
 /**
 */
@@ -37,6 +39,7 @@ public:
 	CodeEditorComponent /*vertexEditorComp,*/ fragmentEditorComp;
 
 	void timerCallback() override;
+	void setMidiCCValue(juce::MidiMessage midiCC);
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -45,10 +48,15 @@ private:
 
 	GLSLComponent m_GLSLCompo;
 
+	std::queue<juce::MidiMessage> m_midiCCqueue;
+
 	enum { shaderLinkDelay = 500 };
 
 	void codeDocumentTextInserted(const String& /*newText*/, int /*insertIndex*/) override;
 	void codeDocumentTextDeleted(int /*startIndex*/, int /*endIndex*/) override;
+	void sendMidiCCValue();
+	
+	bool isNeedShaderCompile = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessorEditor)
 };

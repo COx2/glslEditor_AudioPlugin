@@ -123,6 +123,33 @@ bool GlslplugInAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 
 void GlslplugInAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
+	auto editor = static_cast<GlslplugInAudioProcessorEditor*>(getActiveEditor());
+
+	///////////////////////////////////////////////////////////
+	int time;
+	MidiMessage m;
+
+	for (MidiBuffer::Iterator i(midiMessages); i.getNextEvent(m, time);)
+	{
+		if (m.isNoteOn())
+		{
+		}
+		else if (m.isNoteOff())
+		{
+		}
+		else if (m.isAftertouch())
+		{
+		}
+		else if (m.isPitchWheel())
+		{
+		}
+		else if (m.isController())
+		{
+			editor->setMidiCCValue(m);
+		}
+	}
+
+	///////////////////////////////////////////////////////////
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
 

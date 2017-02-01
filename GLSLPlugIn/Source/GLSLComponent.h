@@ -126,6 +126,11 @@ public:
 			if(isMouseButtonDown())
 				uniforms->mouse->set(mouseX * 0.1f, mouseY * 0.1f);
 		}
+		
+		if (uniforms->midiCC != nullptr) {
+			uniforms->midiCC->set(m_midiCC, 128);
+		}
+		
 
 		//////////////////////////////////////
 
@@ -256,6 +261,16 @@ public:
 		newFragmentShader = fragmentShader;
 	}
 
+	void setMidiCCValue(int ccNumber, float value) 	
+	{
+		if (ccNumber < 128) {
+			m_midiCC[ccNumber] = value;
+			auto cText = statusLabel->getText();
+			cText += " /" + String(ccNumber) + "-" + String(value, 3);
+			statusLabel->setText(cText, dontSendNotification);
+		}
+	}
+
 private:
     //==============================================================================
     struct Vertex
@@ -378,11 +393,12 @@ private:
 			time = createUniform(openGLContext, shaderProgram, "time");
 			resolution = createUniform(openGLContext, shaderProgram, "resolution");
 			mouse = createUniform(openGLContext, shaderProgram, "mouse");
+			midiCC = createUniform(openGLContext, shaderProgram, "midiCC");
         }
 
-		// 追加したいUniform変数を宣言
+		// 追加したいUniform変数を宣言 ポインタを格納する
         ScopedPointer<OpenGLShaderProgram::Uniform> 
-			projectionMatrix, viewMatrix, time ,resolution, mouse;
+			projectionMatrix, viewMatrix, time ,resolution, mouse, midiCC, audio, spectrum;
 
     private:
         static OpenGLShaderProgram::Uniform* createUniform (OpenGLContext& openGLContext,
@@ -537,6 +553,7 @@ private:
 
     String newVertexShader, newFragmentShader;
 	float mouseX, mouseY;
+	float m_midiCC[128] = {0};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GLSLComponent)
 };
