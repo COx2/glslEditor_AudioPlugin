@@ -12,7 +12,11 @@ License : GPL v3
 [JUCE JAPAN / Outlaw Faction](http://oufac.com/ "Outlaw Faction")
 
 ## What's an this project? ##
+GLSL Editor running on VST/AU plugin host Applications Cubase, StudioOne, Ableton Live, Logic, and more...
+This Editor already defined uniform variables, and GLSL code compatible for "GLSL Sandbox".
+http://glslsandbox.com/
 
+This demo movie has copy and paste the glsl codes from "GLSL Sandbox Gallery".
 ![Alt Text](VST_GLSL_0134.gif)
 
 ## Building ##
