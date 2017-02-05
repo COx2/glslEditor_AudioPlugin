@@ -55,7 +55,19 @@ public:
 
     void initialise() override
     {
-        createShaders();
+		// Shaderがnullにならないように代入しておく
+		vertexShader = defaultVertexShader;
+		fragmentShader = defaultFragmentShader;
+
+		if (isShaderCacheReady) 
+		{
+			fragmentShader = ShaderCache.toStdString().c_str();
+			createShaders();
+		}
+		else
+		{
+			createShaders();
+		}
     }
 
     void shutdown() override
@@ -65,27 +77,6 @@ public:
         attributes = nullptr;
         uniforms = nullptr;
     }
-
-    Matrix3D<float> getProjectionMatrix() const
-    {
-        float w = 1.0f / (0.5f + 0.1f);
-        float h = w * getLocalBounds().toFloat().getAspectRatio (false);
-        return Matrix3D<float>::fromFrustum (-w, w, -h, h, 4.0f, 30.0f);
-    }
-
-    Matrix3D<float> getViewMatrix() const
-    {
-        Matrix3D<float> viewMatrix (Vector3D<float> (0.0f, 0.0f, -5.0f /*-10.0f*/));
-        Matrix3D<float> rotationMatrix = viewMatrix.rotated (Vector3D<float> (-0.3f, 5.0f * std::sin (getFrameCounter() * 0.01f), 0.0f));
-
-        return /*rotationMatrix * */viewMatrix;
-    }
-
-	void mouseDrag(const MouseEvent& event) 
-	{
-		mouseX = event.getPosition().getX();
-		mouseY = event.getPosition().getY();
-	}
 
     void render() override
     {
@@ -172,79 +163,6 @@ public:
 
     }
 
-    void createShaders()
-    {
-        vertexShader =
-            "attribute vec4 position;\n"
-            "attribute vec4 sourceColour;\n"
-            "attribute vec2 texureCoordIn;\n"
-            "\n"
-            "uniform mat4 projectionMatrix;\n"
-            "uniform mat4 viewMatrix;\n"
-            "\n"
-            "varying vec4 destinationColour;\n"
-            "varying vec2 textureCoordOut;\n"
-            "\n"
-            "void main()\n"
-            "{\n"
-            "    destinationColour = sourceColour;\n"
-            "    textureCoordOut = texureCoordIn;\n"
-            "    gl_Position = projectionMatrix * viewMatrix * position;\n"
-			//"    gl_Position = projectionMatrix * viewMatrix * position;\n"
-            "}\n";
-
-		fragmentShader =
-#if JUCE_OPENGL_ES
-			"varying lowp vec4 destinationColour;\n"
-			"varying lowp vec2 textureCoordOut;\n"
-#else
-			"varying vec4 destinationColour;\n"
-			"varying vec2 textureCoordOut;\n"
-#endif
-			"#extension GL_OES_standard_derivatives : enable\n"
-
-			"uniform float time;\n"  /**/
-			"uniform vec2 mouse;\n" /**/
-			"uniform vec2 resolution;\n" /**/
-			"\n"
-			
-			"#define pi 3.1415\n"
-
-			"void main()\n"
-			"{\n"
-			"vec2 position = (gl_FragCoord.xy / resolution.xy);\n"
-			"float r = abs(cos(position.x + time*position.y));\n"
-			"float g = abs(sin(position.x - position.y + time + mouse.x));\n"
-			"float b = abs(tan(position.y + time + mouse.y));\n"
-			"gl_FragColor = vec4(r, g, b, 1.0);\n"
-            "}\n";
-
-        ScopedPointer<OpenGLShaderProgram> newShader (new OpenGLShaderProgram (openGLContext));
-        String statusText;
-
-        if (newShader->addVertexShader (OpenGLHelpers::translateVertexShaderToV3 (vertexShader))
-              && newShader->addFragmentShader (OpenGLHelpers::translateFragmentShaderToV3 (fragmentShader))
-              && newShader->link())
-        {
-            shape = nullptr;
-            attributes = nullptr;
-            uniforms = nullptr;
-
-            shader = newShader;
-            shader->use();
-
-            shape      = new Shape (openGLContext);
-            attributes = new Attributes (openGLContext, *shader);
-            uniforms   = new Uniforms (openGLContext, *shader);
-
-            statusText = "GLSL: v" + String (OpenGLShaderProgram::getLanguageVersion(), 2);
-        }
-        else
-        {
-            statusText = newShader->getLastError();
-        }
-    }
-
 	void setStatusLabel(Label* _statusLabel) 
 	{
 		statusLabel = _statusLabel;
@@ -314,6 +232,34 @@ private:
     };
 
 	//==============================================================================
+	void createShaders()
+	{
+		ScopedPointer<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
+		String statusText;
+
+		if (newShader->addVertexShader(OpenGLHelpers::translateVertexShaderToV3(vertexShader))
+			&& newShader->addFragmentShader(OpenGLHelpers::translateFragmentShaderToV3(fragmentShader))
+			&& newShader->link())
+		{
+			shape = nullptr;
+			attributes = nullptr;
+			uniforms = nullptr;
+
+			shader = newShader;
+			shader->use();
+
+			shape = new Shape(openGLContext);
+			attributes = new Attributes(openGLContext, *shader);
+			uniforms = new Uniforms(openGLContext, *shader);
+
+			statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
+		}
+		else
+		{
+			statusText = newShader->getLastError();
+		}
+	}
+
 	void updateShader()
 	{
 		if (newVertexShader.isNotEmpty() || newFragmentShader.isNotEmpty())
@@ -349,6 +295,27 @@ private:
 			newVertexShader = String();
 			newFragmentShader = String();
 		}
+	}
+
+	void mouseDrag(const MouseEvent& event)
+	{
+		mouseX = event.getPosition().getX();
+		mouseY = event.getPosition().getY();
+	}
+
+	Matrix3D<float> getProjectionMatrix() const
+	{
+		float w = 1.0f / (0.5f + 0.1f);
+		float h = w * getLocalBounds().toFloat().getAspectRatio(false);
+		return Matrix3D<float>::fromFrustum(-w, w, -h, h, 4.0f, 30.0f);
+	}
+
+	Matrix3D<float> getViewMatrix() const
+	{
+		Matrix3D<float> viewMatrix(Vector3D<float>(0.0f, 0.0f, -5.0f /*-10.0f*/));
+		Matrix3D<float> rotationMatrix = viewMatrix.rotated(Vector3D<float>(-0.3f, 5.0f * std::sin(getFrameCounter() * 0.01f), 0.0f));
+
+		return /*rotationMatrix * */viewMatrix;
 	}
 
     //==============================================================================
@@ -592,11 +559,54 @@ private:
 	float m_wave[256] = { 0 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GLSLComponent)
+
+	const char* defaultVertexShader =
+		"attribute vec4 position;\n"
+		"attribute vec4 sourceColour;\n"
+		"attribute vec2 texureCoordIn;\n"
+		"\n"
+		"uniform mat4 projectionMatrix;\n"
+		"uniform mat4 viewMatrix;\n"
+		"\n"
+		"varying vec4 destinationColour;\n"
+		"varying vec2 textureCoordOut;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"    destinationColour = sourceColour;\n"
+		"    textureCoordOut = texureCoordIn;\n"
+		"    gl_Position = projectionMatrix * viewMatrix * position;\n"
+		"}\n";
+
+	const char* defaultFragmentShader =
+#if JUCE_OPENGL_ES
+		"varying lowp vec4 destinationColour;\n"
+		"varying lowp vec2 textureCoordOut;\n"
+#else
+		"varying vec4 destinationColour;\n"
+		"varying vec2 textureCoordOut;\n"
+#endif
+		"#extension GL_OES_standard_derivatives : enable\n"
+
+		"uniform float time;\n"  /**/
+		"uniform vec2 mouse;\n" /**/
+		"uniform vec2 resolution;\n" /**/
+		"\n"
+
+		"#define pi 3.1415\n"
+
+		"void main()\n"
+		"{\n"
+		"vec2 position = (gl_FragCoord.xy / resolution.xy);\n"
+		"float r = abs(cos(position.x + time*position.y));\n"
+		"float g = abs(sin(position.x - position.y + time + mouse.x));\n"
+		"float b = abs(tan(position.y + time + mouse.y));\n"
+		"gl_FragColor = vec4(r, g, b, 1.0);\n"
+		"}\n";
 };
 
 
 // (This function is called by the app startup code to create our main component)
 //Component* createMainContentComponent()    { return new GLSLComponent(); }
-
 
 #endif  // MAINCOMPONENT_H_INCLUDED
