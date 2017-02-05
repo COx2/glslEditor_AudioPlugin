@@ -6,7 +6,7 @@
               buildAAX="0" pluginName="GLSLPlugIn" pluginDesc="GLSLPlugIn"
               pluginManufacturer="JUCE JAPAN" pluginManufacturerCode="Manu"
               pluginCode="X25u" pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="1"
-              pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
+              pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="1"
               pluginAUExportPrefix="GLSLPlugInAU" pluginRTASCategory="" aaxIdentifier="com.yourcompany.GLSLPlugIn"
               pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="4.3.0"
               companyName="JUCE JAPAN">

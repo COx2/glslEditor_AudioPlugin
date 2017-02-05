@@ -66,6 +66,7 @@ public:
 		}
 		else
 		{
+			fragmentDoc->replaceAllContent(defaultFragmentShader);
 			createShaders();
 		}
     }
@@ -163,9 +164,14 @@ public:
 
     }
 
-	void setStatusLabel(Label* _statusLabel) 
+	void setStatusLabelPtr(Label* _statusLabel) 
 	{
 		statusLabel = _statusLabel;
+	}
+
+	void setFragmentDocPtr(CodeDocument* _fragmentDoc)
+	{
+		fragmentDoc = _fragmentDoc;
 	}
 
 	void setShaderProgram(const String& vertexShader, const String& fragmentShader)
@@ -190,7 +196,6 @@ public:
 	{
 		if (ccNumber < 128) {
 			m_midiCC[ccNumber] = value;
-
 			auto cText = statusLabel->getText();
 			cText += " /" + String(ccNumber) + "-" + String(value, 1);
 			statusLabel->setText(cText, dontSendNotification);
@@ -202,11 +207,6 @@ public:
 		if (spectrumNumber < 256) {
 			m_spectrum[spectrumNumber] = value;
 		}
-		/*if (spectrumNumber == 64) {
-			auto cText = statusLabel->getText();
-			cText += " /" + String(spectrumNumber) + "-" + String(value, 1);
-			statusLabel->setText(cText, dontSendNotification);
-		}*/
 	}
 
 	void setWaveValue(int waveNumber, float value)
@@ -214,11 +214,6 @@ public:
 		if (waveNumber < 256) {
 			m_wave[waveNumber] = value;
 		}
-		/*if (spectrumNumber == 64) {
-		auto cText = statusLabel->getText();
-		cText += " /" + String(spectrumNumber) + "-" + String(value, 1);
-		statusLabel->setText(cText, dontSendNotification);
-		}*/
 	}
 
 private:
@@ -544,6 +539,7 @@ private:
     const char* fragmentShader;
 
 	Label* statusLabel;
+	CodeDocument* fragmentDoc;
 	
     ScopedPointer<OpenGLShaderProgram> shader;
     ScopedPointer<Shape> shape;
@@ -591,17 +587,19 @@ private:
 		"uniform float time;\n"  /**/
 		"uniform vec2 mouse;\n" /**/
 		"uniform vec2 resolution;\n" /**/
+		"uniform float midiCC[128];\n"  /**/
+		"uniform float wave[256];\n" /**/
+		"uniform float spectrum[256];\n" /**/
 		"\n"
-
 		"#define pi 3.1415\n"
-
+		"\n"
 		"void main()\n"
 		"{\n"
-		"vec2 position = (gl_FragCoord.xy / resolution.xy);\n"
-		"float r = abs(cos(position.x + time*position.y));\n"
-		"float g = abs(sin(position.x - position.y + time + mouse.x));\n"
-		"float b = abs(tan(position.y + time + mouse.y));\n"
-		"gl_FragColor = vec4(r, g, b, 1.0);\n"
+		"    vec2 position = (gl_FragCoord.xy / resolution.xy);\n"
+		"    float r = abs(cos(position.x + time*position.y * spectrum[position.x * 256]));\n"
+		"    float g = abs(sin(position.x - position.y + time + mouse.x));\n"
+		"    float b = abs(tan(position.y + time + mouse.y * wave[position.y * 256]));\n"
+		"    gl_FragColor = vec4(r, g, b, 1.0);\n"
 		"}\n";
 };
 

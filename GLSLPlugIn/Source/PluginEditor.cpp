@@ -24,22 +24,23 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
     // editor's size to whatever you need it to be.
     setSize (800, 1000);
 
+	m_GLSLCompo.setStatusLabelPtr(&m_statusLabel);
+	m_GLSLCompo.setFragmentDocPtr(&fragmentDocument);
 	addAndMakeVisible(m_GLSLCompo);
-	m_GLSLCompo.setStatusLabel(&m_statusLabel);
 
 	Colour editorBackground(Colours::darkgrey);
 	Colour editorForeground(Colours::white);
 
-	addAndMakeVisible(fragmentEditorComp);
 	fragmentEditorComp.setColour(CodeEditorComponent::backgroundColourId, editorBackground);
 	fragmentEditorComp.setColour(CodeEditorComponent::defaultTextColourId, editorForeground);
 	fragmentDocument.addListener(this);
+	addAndMakeVisible(fragmentEditorComp);
 
-	addAndMakeVisible(m_statusLabel);
 	m_statusLabel.setJustificationType(Justification::topLeft);
 	m_statusLabel.setColour(Label::backgroundColourId, Colours::darkcyan);
 	m_statusLabel.setColour(Label::textColourId, Colours::white);
 	m_statusLabel.setFont(Font(14.0f));
+	addAndMakeVisible(m_statusLabel);
 
 	startTimer(15);
 
