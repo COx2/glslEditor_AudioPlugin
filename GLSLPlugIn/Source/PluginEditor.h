@@ -41,22 +41,40 @@ public:
 	void timerCallback() override;
 	void setMidiCCValue(juce::MidiMessage midiCC);
 
+	enum
+	{
+		fftOrder = 9,
+		fftSize = 1 << fftOrder
+	};
+
+	void pushNextSampleIntoFifo(float sample) noexcept;
+	
+
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     GlslplugInAudioProcessor& processor;
-
 	GLSLComponent m_GLSLCompo;
-
-	std::queue<juce::MidiMessage> m_midiCCqueue;
-
 	enum { shaderLinkDelay = 500 };
-
+	bool isNeedShaderCompile = false;
 	void codeDocumentTextInserted(const String& /*newText*/, int /*insertIndex*/) override;
 	void codeDocumentTextDeleted(int /*startIndex*/, int /*endIndex*/) override;
+
+	std::queue<juce::MidiMessage> m_midiCCqueue;
 	void sendMidiCCValue();
-	
-	bool isNeedShaderCompile = false;
+	void sendNextSpectrum();
+	void sendNextWave();
+
+	// FFT 
+	FFT forwardFFT;
+	float fifo[fftSize];
+	float fftData[2 * fftSize];
+	int fifoIndex;
+	bool nextFFTBlockReady;
+
+	// Wave
+	bool nextWaveBlockReady;
+	float waveData[fftSize];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessorEditor)
 };

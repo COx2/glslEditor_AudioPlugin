@@ -25,6 +25,8 @@ GlslplugInAudioProcessor::GlslplugInAudioProcessor()
                        )
 #endif
 {
+	ShaderCache = "";
+	isShaderCacheReady = false;
 }
 
 GlslplugInAudioProcessor::~GlslplugInAudioProcessor()
@@ -145,7 +147,8 @@ void GlslplugInAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuff
 		}
 		else if (m.isController())
 		{
-			editor->setMidiCCValue(m);
+			if(editor != nullptr)
+				editor->setMidiCCValue(m);
 		}
 	}
 
@@ -169,6 +172,14 @@ void GlslplugInAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuff
         float* channelData = buffer.getWritePointer (channel);
 
         // ..do something to the data...
+		if (channel == 0)
+		{
+			if (editor != nullptr)
+			{
+				for (int i = 0; i < buffer.getNumSamples(); ++i)
+					editor->pushNextSampleIntoFifo(channelData[i]);
+			}
+		}
     }
 }
 

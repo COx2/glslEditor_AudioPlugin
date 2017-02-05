@@ -15,6 +15,9 @@
 GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p),
 	//m_GLSLCompo(&m_statusLabel),
+	forwardFFT(fftOrder, false),
+	fifoIndex(0),
+	nextFFTBlockReady(false),
 	fragmentEditorComp(fragmentDocument, nullptr)
 {
     // Make sure that before the constructor has finished, you've set the
@@ -38,7 +41,12 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	m_statusLabel.setColour(Label::textColourId, Colours::white);
 	m_statusLabel.setFont(Font(14.0f));
 
-	startTimer(30);
+	startTimer(15);
+
+	if (isShaderCacheReady) 
+	{
+		fragmentDocument.replaceAllContent(ShaderCache);
+	}
 }
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()
@@ -70,11 +78,30 @@ void GlslplugInAudioProcessorEditor::timerCallback()
 	if (isNeedShaderCompile) {
 		stopTimer();
 		m_GLSLCompo.setShaderProgramFragment(fragmentDocument.getAllContent());
-		startTimer(30);
+
+		ShaderCache = fragmentDocument.getAllContent();
+		isShaderCacheReady = true;
+
+		startTimer(60);
 	}
 
+	// MIDI CC
 	if (!m_midiCCqueue.empty()) {
 		sendMidiCCValue();
+	}
+
+	// Wave
+	if (nextWaveBlockReady)
+	{
+		sendNextWave();
+		nextWaveBlockReady = false;
+	}
+
+	// FFT
+	if (nextFFTBlockReady)
+	{
+		sendNextSpectrum();
+		nextFFTBlockReady = false;
 	}
 }
 
@@ -102,8 +129,53 @@ void GlslplugInAudioProcessorEditor::sendMidiCCValue()
 		juce::MidiMessage midiCC = m_midiCCqueue.front();
 		m_midiCCqueue.pop();
 		m_GLSLCompo.setMidiCCValue(midiCC.getControllerNumber(), midiCC.getControllerValue());
-		//auto cText = m_statusLabel.getText();
-		//cText += " /" + String(midiCC.getControllerNumber()) + "-" + String(midiCC.getControllerValue());
-		//m_statusLabel.setText(cText, dontSendNotification);
+	}
+}
+
+void GlslplugInAudioProcessorEditor::pushNextSampleIntoFifo(float sample) noexcept
+{
+	// if the fifo contains enough data, set a flag to say
+	// that the next line should now be rendered..
+	if (fifoIndex == fftSize)
+	{
+		if (!nextWaveBlockReady)
+		{
+			zeromem(waveData, sizeof(waveData));
+			memcpy(waveData, fifo, sizeof(fifo));
+			nextWaveBlockReady = true;
+		}
+
+		if (!nextFFTBlockReady)
+		{
+			zeromem(fftData, sizeof(fftData));
+			memcpy(fftData, fifo, sizeof(fifo));
+			nextFFTBlockReady = true;
+		}
+
+		fifoIndex = 0;
+	}
+
+	fifo[fifoIndex++] = sample;
+}
+
+void GlslplugInAudioProcessorEditor::sendNextSpectrum()
+{
+	// then render our FFT data..
+	forwardFFT.performFrequencyOnlyForwardTransform(fftData);
+
+	// find the range of values produced, so we can scale our rendering to
+	// show up the detail clearly
+	for (int i = 0; i < fftSize; i++) 
+	{
+		auto spectrumVal = fftData[i];
+		m_GLSLCompo.setSpectrumValue(i, spectrumVal * spectrumVal);
+	}
+}
+
+void GlslplugInAudioProcessorEditor::sendNextWave() 
+{
+	for (int i = 0; i < fftSize; i++)
+	{
+		m_GLSLCompo.setWaveValue(i, waveData[i]);
 	}
 }

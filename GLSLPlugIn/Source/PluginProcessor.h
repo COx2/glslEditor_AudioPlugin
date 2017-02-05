@@ -61,5 +61,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessor)
 };
 
+static String ShaderCache;
+static bool isShaderCacheReady;
 
 #endif  // PLUGINPROCESSOR_H_INCLUDED

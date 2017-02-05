@@ -131,7 +131,14 @@ public:
 			uniforms->midiCC->set(m_midiCC, 128);
 		}
 		
+		if (uniforms->spectrum != nullptr) {
+			uniforms->spectrum->set(m_spectrum, 256);
+		}
 
+		if (uniforms->wave != nullptr) {
+			uniforms->wave->set(m_wave, 256);
+		}
+		
 		//////////////////////////////////////
 
         shape->draw (openGLContext, *attributes);
@@ -265,10 +272,35 @@ public:
 	{
 		if (ccNumber < 128) {
 			m_midiCC[ccNumber] = value;
+
 			auto cText = statusLabel->getText();
-			cText += " /" + String(ccNumber) + "-" + String(value, 3);
+			cText += " /" + String(ccNumber) + "-" + String(value, 1);
 			statusLabel->setText(cText, dontSendNotification);
 		}
+	}
+
+	void setSpectrumValue(int spectrumNumber, float value)
+	{
+		if (spectrumNumber < 256) {
+			m_spectrum[spectrumNumber] = value;
+		}
+		/*if (spectrumNumber == 64) {
+			auto cText = statusLabel->getText();
+			cText += " /" + String(spectrumNumber) + "-" + String(value, 1);
+			statusLabel->setText(cText, dontSendNotification);
+		}*/
+	}
+
+	void setWaveValue(int waveNumber, float value)
+	{
+		if (waveNumber < 256) {
+			m_wave[waveNumber] = value;
+		}
+		/*if (spectrumNumber == 64) {
+		auto cText = statusLabel->getText();
+		cText += " /" + String(spectrumNumber) + "-" + String(value, 1);
+		statusLabel->setText(cText, dontSendNotification);
+		}*/
 	}
 
 private:
@@ -394,11 +426,13 @@ private:
 			resolution = createUniform(openGLContext, shaderProgram, "resolution");
 			mouse = createUniform(openGLContext, shaderProgram, "mouse");
 			midiCC = createUniform(openGLContext, shaderProgram, "midiCC");
+			spectrum = createUniform(openGLContext, shaderProgram, "spectrum");
+			wave = createUniform(openGLContext, shaderProgram, "wave");
         }
 
 		// 追加したいUniform変数を宣言 ポインタを格納する
-        ScopedPointer<OpenGLShaderProgram::Uniform> 
-			projectionMatrix, viewMatrix, time ,resolution, mouse, midiCC, audio, spectrum;
+		ScopedPointer<OpenGLShaderProgram::Uniform>
+			projectionMatrix, viewMatrix, time, resolution, mouse, midiCC, wave, waveL, waveR, spectrum, spectrumL, spectrumR;
 
     private:
         static OpenGLShaderProgram::Uniform* createUniform (OpenGLContext& openGLContext,
@@ -554,6 +588,8 @@ private:
     String newVertexShader, newFragmentShader;
 	float mouseX, mouseY;
 	float m_midiCC[128] = {0};
+	float m_spectrum[256] = { 0 };
+	float m_wave[256] = { 0 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GLSLComponent)
 };
