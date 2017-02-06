@@ -560,18 +560,23 @@ private:
 		"attribute vec4 position;\n"
 		"attribute vec4 sourceColour;\n"
 		"attribute vec2 texureCoordIn;\n"
+		"attribute vec2 surfacePosAttrib;\n"
 		"\n"
 		"uniform mat4 projectionMatrix;\n"
 		"uniform mat4 viewMatrix;\n"
 		"\n"
 		"varying vec4 destinationColour;\n"
 		"varying vec2 textureCoordOut;\n"
+		"varying vec2 surfacePosition;\n"
 		"\n"
 		"void main()\n"
 		"{\n"
 		"    destinationColour = sourceColour;\n"
 		"    textureCoordOut = texureCoordIn;\n"
-		"    gl_Position = projectionMatrix * viewMatrix * position;\n"
+		//"    gl_Position = projectionMatrix * viewMatrix * position;\n"
+
+		"    surfacePosition = surfacePosAttrib;\n"
+		"    gl_Position = vec4(position);\n"
 		"}\n";
 
 	const char* defaultFragmentShader =
@@ -583,7 +588,7 @@ private:
 		"varying vec2 textureCoordOut;\n"
 #endif
 		"#extension GL_OES_standard_derivatives : enable\n"
-
+		"\n"
 		"uniform float time;\n"  /**/
 		"uniform vec2 mouse;\n" /**/
 		"uniform vec2 resolution;\n" /**/
