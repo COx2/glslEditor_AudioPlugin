@@ -61,8 +61,8 @@ public:
 
 		if (isShaderCacheReady) 
 		{
-			fragmentShader = ShaderCache.toStdString().c_str();
-			createShaders();
+			setShaderProgramFragment(ShaderCache);
+			updateShader();
 		}
 		else
 		{
@@ -81,7 +81,7 @@ public:
 
     void render() override
     {
-		if(isShaderCacheReady && isNeedShaderCompile)
+		if(isShaderCompileReady)
 			updateShader();
 
         jassert (OpenGLHelpers::isContextActive());
@@ -179,18 +179,21 @@ public:
 	{
 		newVertexShader = vertexShader;
 		newFragmentShader = fragmentShader;
+		isShaderCompileReady = true;
 	}
 
 	void setShaderProgramFragment(const String& _fragmentShader)
 	{
 		newVertexShader = vertexShader;
 		newFragmentShader = _fragmentShader;
+		isShaderCompileReady = true;
 	}
 
 	void setShaderProgramVertex(const String& _vertexShader)
 	{
 		newVertexShader = _vertexShader;
 		newFragmentShader = fragmentShader;
+		isShaderCompileReady = true;
 	}
 
 	void setMidiCCValue(int ccNumber, float value) 	
@@ -257,6 +260,8 @@ private:
 
 		if (statusLabel != nullptr)
 			statusLabel->setText(statusText, dontSendNotification);
+
+		isShaderCompileReady = false;
 	}
 
 	void updateShader()
@@ -293,9 +298,9 @@ private:
 
 			newVertexShader = String();
 			newFragmentShader = String();
-		}
 
-		isNeedShaderCompile = false;
+			isShaderCompileReady = false;
+		}
 	}
 
 	void mouseDrag(const MouseEvent& event)
@@ -555,6 +560,8 @@ private:
 	GLfloat timeCounter = 0.0f;
 
     String newVertexShader, newFragmentShader;
+	bool isShaderCompileReady = false;
+
 	float mouseX, mouseY;
 	float m_midiCC[128] = {0};
 	float m_spectrum[256] = { 0 };

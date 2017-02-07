@@ -22,7 +22,8 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (1480, 600);
+    setSize (1440, 600);
+	getTopLevelComponent()->addKeyListener(this);
 
 	m_GLSLCompo.setStatusLabelPtr(&m_statusLabel);
 	m_GLSLCompo.setFragmentDocPtr(&fragmentDocument);
@@ -48,9 +49,6 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	{
 		fragmentDocument.replaceAllContent(ShaderCache);
 	}
-
-	getTopLevelComponent()->addKeyListener(this);
-
 }
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()
@@ -71,15 +69,15 @@ void GlslplugInAudioProcessorEditor::resized()
     // subcomponents in your editor..
 	m_GLSLCompo.setBounds(0, 0, 800, 600);
 
-	fragmentEditorComp.setBounds(800, 0, 680, 540);
+	fragmentEditorComp.setBounds(800, 0, 640, 540);
 
-	m_statusLabel.setBounds(800, 540, 680, 60);
+	m_statusLabel.setBounds(800, 540, 640, 60);
 
 	if (isCodeEditorShow)
 	{
 		fragmentEditorComp.setVisible(true);
 		m_statusLabel.setVisible(true);
-		this->setSize(1480, 600);
+		this->setSize(1440, 600);
 	}
 	else
 	{
@@ -92,12 +90,17 @@ void GlslplugInAudioProcessorEditor::resized()
 //==============================================================================
 void GlslplugInAudioProcessorEditor::timerCallback()
 {
-	if (isNeedShaderCompile) {
-		stopTimer();
-		m_GLSLCompo.setShaderProgramFragment(fragmentDocument.getAllContent());
+	if (isNeedShaderCompile) 
+	{
+		isNeedShaderCompile = false;
 
+		stopTimer();
+		
 		ShaderCache = fragmentDocument.getAllContent();
 		isShaderCacheReady = true;
+
+		m_GLSLCompo.setShaderProgramFragment(ShaderCache);
+
 		startTimer(60);
 	}
 
@@ -125,14 +128,12 @@ void GlslplugInAudioProcessorEditor::codeDocumentTextInserted(const String& /*ne
 {
 	startTimer(shaderLinkDelay);
 	isNeedShaderCompile = true;
-	isShaderCacheReady = false;
 }
 
 void GlslplugInAudioProcessorEditor::codeDocumentTextDeleted(int /*startIndex*/, int /*endIndex*/)
 {
 	startTimer(shaderLinkDelay);
 	isNeedShaderCompile = true;
-	isShaderCacheReady = false;
 }
 
 void GlslplugInAudioProcessorEditor::setMidiCCValue(juce::MidiMessage midiCC)

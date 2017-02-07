@@ -83,6 +83,8 @@ private:
 	bool keyPressed(const KeyPress& key, Component* originatingComponent) override;
 	bool isCodeEditorShow = true;
 
+	bool isNeedShaderCompile = false;
+	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessorEditor)
 };
 

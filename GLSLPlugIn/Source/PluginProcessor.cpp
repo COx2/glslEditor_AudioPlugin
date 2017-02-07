@@ -200,12 +200,32 @@ void GlslplugInAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+	XmlElement root("Root");
+	XmlElement *el;
+	el = root.createNewChildElement("FragmentShader");
+	el->addTextElement(ShaderCache);
+	copyXmlToBinary(root, destData);
+
 }
 
 void GlslplugInAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+	XmlElement* pRoot = getXmlFromBinary(data, sizeInBytes);
+	if (pRoot != NULL)
+	{
+		forEachXmlChildElement((*pRoot), pChild)
+		{
+			if (pChild->hasTagName("FragmentShader"))
+			{
+				String text = pChild->getAllSubText();
+				ShaderCache = text;
+				isShaderCacheReady = true;
+			}
+		}
+		delete pRoot;
+	}
 }
 
 //==============================================================================

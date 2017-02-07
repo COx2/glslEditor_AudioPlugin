@@ -63,5 +63,5 @@ private:
 
 static String ShaderCache;
 static bool isShaderCacheReady = false;
-static bool isNeedShaderCompile = false;
+
 #endif  // PLUGINPROCESSOR_H_INCLUDED
