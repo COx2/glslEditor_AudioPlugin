@@ -24,6 +24,7 @@ class GlslplugInAudioProcessorEditor  : public AudioProcessorEditor,
 										//private ComboBox::Listener,
 										//private Slider::Listener,
 										//private Button::Listener,
+										public KeyListener,
 										private Timer
 {
 public:
@@ -56,7 +57,6 @@ private:
     GlslplugInAudioProcessor& processor;
 	GLSLComponent m_GLSLCompo;
 	enum { shaderLinkDelay = 500 };
-	bool isNeedShaderCompile = false;
 	void codeDocumentTextInserted(const String& /*newText*/, int /*insertIndex*/) override;
 	void codeDocumentTextDeleted(int /*startIndex*/, int /*endIndex*/) override;
 
@@ -75,6 +75,13 @@ private:
 	// Wave
 	bool nextWaveBlockReady;
 	float waveData[fftSize];
+
+	// KeyListener
+	// ‚±‚Á‚¿‚Í‘–‚ç‚¸
+	//bool keyPressed(const KeyPress& key) override;
+	// ‘–‚é‚Ì‚Í‚±‚Á‚¿
+	bool keyPressed(const KeyPress& key, Component* originatingComponent) override;
+	bool isCodeEditorShow = true;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessorEditor)
 };

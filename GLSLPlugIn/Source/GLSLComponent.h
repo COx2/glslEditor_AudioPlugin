@@ -81,7 +81,8 @@ public:
 
     void render() override
     {
-		updateShader();
+		if(isShaderCacheReady && isNeedShaderCompile)
+			updateShader();
 
         jassert (OpenGLHelpers::isContextActive());
 
@@ -253,6 +254,9 @@ private:
 		{
 			statusText = newShader->getLastError();
 		}
+
+		if (statusLabel != nullptr)
+			statusLabel->setText(statusText, dontSendNotification);
 	}
 
 	void updateShader()
@@ -290,6 +294,8 @@ private:
 			newVertexShader = String();
 			newFragmentShader = String();
 		}
+
+		isNeedShaderCompile = false;
 	}
 
 	void mouseDrag(const MouseEvent& event)

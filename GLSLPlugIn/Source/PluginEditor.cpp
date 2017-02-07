@@ -22,7 +22,7 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (800, 1000);
+    setSize (1480, 600);
 
 	m_GLSLCompo.setStatusLabelPtr(&m_statusLabel);
 	m_GLSLCompo.setFragmentDocPtr(&fragmentDocument);
@@ -48,6 +48,9 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	{
 		fragmentDocument.replaceAllContent(ShaderCache);
 	}
+
+	getTopLevelComponent()->addKeyListener(this);
+
 }
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()
@@ -68,9 +71,22 @@ void GlslplugInAudioProcessorEditor::resized()
     // subcomponents in your editor..
 	m_GLSLCompo.setBounds(0, 0, 800, 600);
 
-	fragmentEditorComp.setBounds(0, 600, 800, 340);
+	fragmentEditorComp.setBounds(800, 0, 680, 540);
 
-	m_statusLabel.setBounds(0, 940, 800, 60);
+	m_statusLabel.setBounds(800, 540, 680, 60);
+
+	if (isCodeEditorShow)
+	{
+		fragmentEditorComp.setVisible(true);
+		m_statusLabel.setVisible(true);
+		this->setSize(1480, 600);
+	}
+	else
+	{
+		fragmentEditorComp.setVisible(false);
+		m_statusLabel.setVisible(false);
+		this->setSize(800, 600);
+	}
 }
 
 //==============================================================================
@@ -82,7 +98,6 @@ void GlslplugInAudioProcessorEditor::timerCallback()
 
 		ShaderCache = fragmentDocument.getAllContent();
 		isShaderCacheReady = true;
-
 		startTimer(60);
 	}
 
@@ -110,12 +125,14 @@ void GlslplugInAudioProcessorEditor::codeDocumentTextInserted(const String& /*ne
 {
 	startTimer(shaderLinkDelay);
 	isNeedShaderCompile = true;
+	isShaderCacheReady = false;
 }
 
 void GlslplugInAudioProcessorEditor::codeDocumentTextDeleted(int /*startIndex*/, int /*endIndex*/)
 {
 	startTimer(shaderLinkDelay);
 	isNeedShaderCompile = true;
+	isShaderCacheReady = false;
 }
 
 void GlslplugInAudioProcessorEditor::setMidiCCValue(juce::MidiMessage midiCC)
@@ -179,4 +196,19 @@ void GlslplugInAudioProcessorEditor::sendNextWave()
 	{
 		m_GLSLCompo.setWaveValue(i, waveData[i]);
 	}
+}
+
+bool GlslplugInAudioProcessorEditor::keyPressed(const KeyPress& key, Component* originatingComponent)
+{
+	//m_statusLabel.setText(m_statusLabel.getText() + "keyCode:" + String(key.getKeyCode()) + "/keyChar:" + String(key.getTextCharacter()), dontSendNotification);
+
+	if (key.getModifiers() == ModifierKeys::ctrlModifier) 
+	{
+		if (key.getKeyCode() == 75) // "k"
+		{
+			isCodeEditorShow = !isCodeEditorShow;
+			this->resized();
+		}
+	}
+	return true;
 }
