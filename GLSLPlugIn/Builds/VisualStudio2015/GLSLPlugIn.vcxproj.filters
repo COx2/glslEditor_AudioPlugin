@@ -382,6 +382,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\GLSLComponent.cpp">
+      <Filter>GLSLPlugIn\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PlayerWindow.cpp">
+      <Filter>GLSLPlugIn\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp">
       <Filter>GLSLPlugIn\Source</Filter>
     </ClCompile>
@@ -2208,6 +2214,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\StaticValues.h">
+      <Filter>GLSLPlugIn\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PlayerWindow.h">
+      <Filter>GLSLPlugIn\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\GLSLComponent.h">
       <Filter>GLSLPlugIn\Source</Filter>
     </ClInclude>
