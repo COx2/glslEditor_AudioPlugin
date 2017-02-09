@@ -23,8 +23,8 @@ GlslplugInAudioProcessor::GlslplugInAudioProcessor()
                        )
 #endif
 {
-	ShaderCache = "";
-	isShaderCacheReady = false;
+	StaticValues::setShaderCache("");
+	StaticValues::setShaderCacheReady(false);
 
 	playerWindow = new PlayerWindow("GLSL Player");
 }
@@ -214,7 +214,7 @@ void GlslplugInAudioProcessor::getStateInformation (MemoryBlock& destData)
 	XmlElement root("Root");
 	XmlElement *el;
 	el = root.createNewChildElement("FragmentShader");
-	el->addTextElement(ShaderCache);
+	el->addTextElement(StaticValues::getShaderCache());
 	copyXmlToBinary(root, destData);
 }
 
@@ -223,20 +223,20 @@ void GlslplugInAudioProcessor::setStateInformation (const void* data, int sizeIn
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 
-	//XmlElement* pRoot = getXmlFromBinary(data, sizeInBytes);
-	//if (pRoot != nullptr)
-	//{
-	//	forEachXmlChildElement(*pRoot, pChild)
-	//	{
-	//		if (pChild->hasTagName("FragmentShader"))
-	//		{
-	//			String text = pChild->getAllSubText();
-	//			ShaderCache = text;
-	//			isShaderCacheReady = true;
-	//		}
-	//	}
-	//	delete pRoot;
-	//}
+	XmlElement* pRoot = getXmlFromBinary(data, sizeInBytes);
+	if (pRoot != nullptr)
+	{
+		juce::XmlElement* pChild;
+		for (pChild = (*pRoot).getFirstChildElement(); pChild != nullptr; pChild = pChild->getNextElement() )
+		{
+			if (pChild->hasTagName("FragmentShader"))
+			{
+				String text = pChild->getAllSubText();
+				StaticValues::setShaderCache(text);
+			}
+		}
+		delete pRoot;
+	}
 }
 
 //==============================================================================

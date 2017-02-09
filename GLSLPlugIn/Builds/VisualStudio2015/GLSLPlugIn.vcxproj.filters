@@ -382,6 +382,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\StaticValues.cpp">
+      <Filter>GLSLPlugIn\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\GLSLComponent.cpp">
       <Filter>GLSLPlugIn\Source</Filter>
     </ClCompile>

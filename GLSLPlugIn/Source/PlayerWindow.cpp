@@ -75,13 +75,13 @@ bool PlayerWindow::keyPressed(const KeyPress& key, Component* originatingCompone
 //==============================================================================
 void PlayerWindow::timerCallback()
 {
-	if (isNeedShaderSync)
+	if (StaticValues::getNeedShaderSync())
 	{
-		isNeedShaderSync = false;
+		StaticValues::setNeedShaderSync(false);
 		
 		stopTimer();
 
-		m_GLSLCompo.setShaderProgramFragment(ShaderCache);
+		m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
 		
 		startTimer(60);
 	}
@@ -108,7 +108,7 @@ void PlayerWindow::timerCallback()
 
 void PlayerWindow::updateShader()
 {
-	m_GLSLCompo.setShaderProgramFragment(ShaderCache);
+	m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
 }
 
 void PlayerWindow::setMidiCCValue(juce::MidiMessage midiCC)

@@ -13,9 +13,17 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-static String ShaderCache;
-static bool isShaderCacheReady = false;
-static bool isNeedShaderSync = false;
+class StaticValues
+{
+public:
+	static const String getShaderCache();
+	static void setShaderCache(String str);
 
+	static bool getShaderCacheReady();
+	static void setShaderCacheReady(bool b);
+
+	static bool getNeedShaderSync();
+	static void setNeedShaderSync(bool b);
+};
 
 #endif  // STATICVALUES_H_INCLUDED

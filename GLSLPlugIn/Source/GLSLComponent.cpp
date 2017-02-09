@@ -27,9 +27,9 @@ void GLSLComponent::initialise()
 	vertexShader = defaultVertexShader;
 	fragmentShader = defaultFragmentShader;
 
-	if (isShaderCacheReady)
+	if (StaticValues::getShaderCacheReady())
 	{
-		setShaderProgramFragment(ShaderCache);
+		setShaderProgramFragment(StaticValues::getShaderCache());
 		updateShader();
 	}
 	else

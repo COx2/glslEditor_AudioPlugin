@@ -46,9 +46,9 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 
 	startTimer(15);
 
-	if (isShaderCacheReady)
+	if (StaticValues::getShaderCacheReady())
 	{
-		fragmentDocument.replaceAllContent(ShaderCache);
+		fragmentDocument.replaceAllContent(StaticValues::getShaderCache());
 	}
 }
 
@@ -97,10 +97,9 @@ void GlslplugInAudioProcessorEditor::timerCallback()
 
 		stopTimer();
 		
-		ShaderCache = fragmentDocument.getAllContent();
-		isShaderCacheReady = true;
+		StaticValues::setShaderCache(fragmentDocument.getAllContent());
 
-		m_GLSLCompo.setShaderProgramFragment(ShaderCache);
+		m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
 
 		setShaderSync();
 
@@ -182,7 +181,7 @@ void GlslplugInAudioProcessorEditor::pushNextSampleIntoFifo(float sample) noexce
 
 void GlslplugInAudioProcessorEditor::setShaderSync()
 {
-	isNeedShaderSync = true;
+	StaticValues::setNeedShaderSync(true);
 }
 
 void GlslplugInAudioProcessorEditor::sendNextSpectrum()

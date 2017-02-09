@@ -131,6 +131,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\StaticValues.cpp"/>
     <ClCompile Include="..\..\Source\GLSLComponent.cpp"/>
     <ClCompile Include="..\..\Source\PlayerWindow.cpp"/>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp"/>
