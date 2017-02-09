@@ -31,7 +31,7 @@ GlslplugInAudioProcessor::GlslplugInAudioProcessor()
 
 GlslplugInAudioProcessor::~GlslplugInAudioProcessor()
 {
-	playerWindow = nullptr; // (deletes our window)
+	delete playerWindow; // (deletes our window)
 }
 
 //==============================================================================

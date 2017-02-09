@@ -50,6 +50,7 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	{
 		fragmentDocument.replaceAllContent(StaticValues::getShaderCache());
 	}
+
 }
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()

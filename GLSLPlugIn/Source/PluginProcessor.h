@@ -61,7 +61,8 @@ public:
 
 private:
     //==============================================================================
-	ScopedPointer<PlayerWindow> playerWindow;
+	//ScopedPointer<PlayerWindow> playerWindow;
+	PlayerWindow* playerWindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessor)
 };
