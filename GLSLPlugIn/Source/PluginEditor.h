@@ -13,17 +13,13 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "GLSLComponent.h"
 
 #include <queue>
 //==============================================================================
 /**
 */
 class GlslplugInAudioProcessorEditor  : public AudioProcessorEditor,
-										private CodeDocument::Listener,
-										//private ComboBox::Listener,
-										//private Slider::Listener,
-										//private Button::Listener,
+										public CodeDocument::Listener,
 										public KeyListener,
 										private Timer
 {
@@ -41,6 +37,7 @@ public:
 
 	void timerCallback() override;
 	void setMidiCCValue(juce::MidiMessage midiCC);
+	void setShaderSync();
 
 	enum
 	{
@@ -50,11 +47,11 @@ public:
 
 	void pushNextSampleIntoFifo(float sample) noexcept;
 	
+	GlslplugInAudioProcessor& processor;
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    GlslplugInAudioProcessor& processor;
 	GLSLComponent m_GLSLCompo;
 	enum { shaderLinkDelay = 500 };
 	void codeDocumentTextInserted(const String& /*newText*/, int /*insertIndex*/) override;

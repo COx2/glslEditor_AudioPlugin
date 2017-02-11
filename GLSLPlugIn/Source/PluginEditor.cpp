@@ -7,6 +7,7 @@
 
   ==============================================================================
 */
+#include "StaticValues.h"
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
@@ -14,7 +15,6 @@
 //==============================================================================
 GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p),
-	//m_GLSLCompo(&m_statusLabel),
 	forwardFFT(fftOrder, false),
 	fifoIndex(0),
 	nextFFTBlockReady(false),
@@ -27,6 +27,7 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 
 	m_GLSLCompo.setStatusLabelPtr(&m_statusLabel);
 	m_GLSLCompo.setFragmentDocPtr(&fragmentDocument);
+	m_GLSLCompo.setEditorPtr(this);
 	addAndMakeVisible(m_GLSLCompo);
 
 	Colour editorBackground(Colours::darkgrey);
@@ -45,10 +46,11 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 
 	startTimer(15);
 
-	if (isShaderCacheReady) 
+	if (StaticValues::getShaderCacheReady())
 	{
-		fragmentDocument.replaceAllContent(ShaderCache);
+		fragmentDocument.replaceAllContent(StaticValues::getShaderCache());
 	}
+
 }
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()
@@ -96,10 +98,11 @@ void GlslplugInAudioProcessorEditor::timerCallback()
 
 		stopTimer();
 		
-		ShaderCache = fragmentDocument.getAllContent();
-		isShaderCacheReady = true;
+		StaticValues::setShaderCache(fragmentDocument.getAllContent());
 
-		m_GLSLCompo.setShaderProgramFragment(ShaderCache);
+		m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
+
+		setShaderSync();
 
 		startTimer(60);
 	}
@@ -175,6 +178,11 @@ void GlslplugInAudioProcessorEditor::pushNextSampleIntoFifo(float sample) noexce
 	}
 
 	fifo[fifoIndex++] = sample;
+}
+
+void GlslplugInAudioProcessorEditor::setShaderSync()
+{
+	StaticValues::setNeedShaderSync(true);
 }
 
 void GlslplugInAudioProcessorEditor::sendNextSpectrum()

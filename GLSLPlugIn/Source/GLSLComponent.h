@@ -25,9 +25,6 @@
 #include "Resources/WavefrontObjParser.h"
 
 #include <math.h>
-
-#include "PluginEditor.h"
-
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all
@@ -37,191 +34,46 @@ class GLSLComponent   : public OpenGLAppComponent
 {
 public:
     //==============================================================================
-	GLSLComponent()
-    {
-        setSize (800, 600);
-    }
+	GLSLComponent();
+	~GLSLComponent();
 
-	GLSLComponent(Label* _statusLabel)
-	{
-		setSize(800, 600);
-		statusLabel= _statusLabel;
-	}
+	void initialise() override;
+	void shutdown() override;
+    
+	void render() override;
 
-    ~GLSLComponent()
-    {
-        shutdownOpenGL();
-    }
+	void paint(Graphics& g) override;
 
-    void initialise() override
-    {
-		// Shaderがnullにならないように代入しておく
-		vertexShader = defaultVertexShader;
-		fragmentShader = defaultFragmentShader;
+	void resized() override;
 
-		if (isShaderCacheReady) 
-		{
-			setShaderProgramFragment(ShaderCache);
-			updateShader();
-		}
-		else
-		{
-			fragmentDoc->replaceAllContent(defaultFragmentShader);
-			createShaders();
-		}
-    }
+	void setStatusLabelPtr(Label* _statusLabel);
 
-    void shutdown() override
-    {
-        shader = nullptr;
-        shape = nullptr;
-        attributes = nullptr;
-        uniforms = nullptr;
-    }
+	void setFragmentDocPtr(CodeDocument* _fragmentDoc);
 
-    void render() override
-    {
-		if(isShaderCompileReady)
-			updateShader();
+	void setEditorPtr(AudioProcessorEditor* _editor);
 
-        jassert (OpenGLHelpers::isContextActive());
+	void setShaderProgram(const String& vertexShader, const String& fragmentShader);
 
-        const float desktopScale = (float) openGLContext.getRenderingScale();
-        OpenGLHelpers::clear (Colour::greyLevel (0.1f));
+	void setShaderProgramFragment(const String& _fragmentShader);
 
-        glEnable (GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	void setShaderProgramVertex(const String& _vertexShader);
 
-        glViewport (0, 0, roundToInt (desktopScale * getWidth()), roundToInt (desktopScale * getHeight()));
+	void setMidiCCValue(int ccNumber, float value);
 
-        shader->use();
+	void setSpectrumValue(int spectrumNumber, float value);
 
-		//////////////////////  VertextShader   ////////////////
-
-        if (uniforms->projectionMatrix != nullptr)
-            uniforms->projectionMatrix->setMatrix4 (getProjectionMatrix().mat, 1, false);
-
-        if (uniforms->viewMatrix != nullptr)
-            uniforms->viewMatrix->setMatrix4 (getViewMatrix().mat, 1, false);
-
-		//////////////////////  FragmentShader   ////////////////
-
-		if (uniforms->time != nullptr) {
-			auto s = sinf(timeCounter);
-			uniforms->time->set(timeCounter);
-		}
-
-		if (uniforms->resolution != nullptr) {
-			uniforms->resolution->set(800, 600);
-		}
-
-		if (uniforms->mouse != nullptr) {
-			if(isMouseButtonDown())
-				uniforms->mouse->set(mouseX * 0.1f, mouseY * 0.1f);
-		}
-		
-		if (uniforms->midiCC != nullptr) {
-			uniforms->midiCC->set(m_midiCC, 128);
-		}
-		
-		if (uniforms->spectrum != nullptr) {
-			uniforms->spectrum->set(m_spectrum, 256);
-		}
-
-		if (uniforms->wave != nullptr) {
-			uniforms->wave->set(m_wave, 256);
-		}
-		
-		//////////////////////////////////////
-
-        shape->draw (openGLContext, *attributes);
-
-        // Reset the element buffers so child Components draw correctly
-        openGLContext.extensions.glBindBuffer (GL_ARRAY_BUFFER, 0);
-        openGLContext.extensions.glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		/**/
-		timeCounter += 0.02f;
-		/**/
-    }
-
-    void paint (Graphics& g) override
-    {
-        // You can add your component specific drawing code here!
-        // This will draw over the top of the openGL background.
-
-        //g.setColour(Colours::white);
-        //g.setFont (20);
-        //g.drawText ("JUCE x GLSL", 25, 20, 300, 30, Justification::left);
-        //g.drawLine (20, 20, 170, 20);
-        //g.drawLine (20, 50, 170, 50);
-    }
-
-    void resized() override
-    {
-        // This is called when the MainContentComponent is resized.
-        // If you add any child components, this is where you should
-        // update their positions.
-
-    }
-
-	void setStatusLabelPtr(Label* _statusLabel) 
-	{
-		statusLabel = _statusLabel;
-	}
-
-	void setFragmentDocPtr(CodeDocument* _fragmentDoc)
-	{
-		fragmentDoc = _fragmentDoc;
-	}
-
-	void setShaderProgram(const String& vertexShader, const String& fragmentShader)
-	{
-		newVertexShader = vertexShader;
-		newFragmentShader = fragmentShader;
-		isShaderCompileReady = true;
-	}
-
-	void setShaderProgramFragment(const String& _fragmentShader)
-	{
-		newVertexShader = vertexShader;
-		newFragmentShader = _fragmentShader;
-		isShaderCompileReady = true;
-	}
-
-	void setShaderProgramVertex(const String& _vertexShader)
-	{
-		newVertexShader = _vertexShader;
-		newFragmentShader = fragmentShader;
-		isShaderCompileReady = true;
-	}
-
-	void setMidiCCValue(int ccNumber, float value) 	
-	{
-		if (ccNumber < 128) {
-			m_midiCC[ccNumber] = value;
-			auto cText = statusLabel->getText();
-			cText += " /" + String(ccNumber) + "-" + String(value, 1);
-			statusLabel->setText(cText, dontSendNotification);
-		}
-	}
-
-	void setSpectrumValue(int spectrumNumber, float value)
-	{
-		if (spectrumNumber < 256) {
-			m_spectrum[spectrumNumber] = value;
-		}
-	}
-
-	void setWaveValue(int waveNumber, float value)
-	{
-		if (waveNumber < 256) {
-			m_wave[waveNumber] = value;
-		}
-	}
+	void setWaveValue(int waveNumber, float value);
 
 private:
-    //==============================================================================
+	//==============================================================================
+	void createShaders();
+	void updateShader();
+	void mouseDrag(const MouseEvent& event);
+
+	Matrix3D<float> getProjectionMatrix() const;
+	Matrix3D<float> getViewMatrix() const;
+	
+	//==============================================================================
     struct Vertex
     {
         float position[3];
@@ -229,102 +81,8 @@ private:
         float colour[4];
         float texCoord[2];
     };
-
+    
 	//==============================================================================
-	void createShaders()
-	{
-		ScopedPointer<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
-		String statusText;
-
-		if (newShader->addVertexShader(OpenGLHelpers::translateVertexShaderToV3(vertexShader))
-			&& newShader->addFragmentShader(OpenGLHelpers::translateFragmentShaderToV3(fragmentShader))
-			&& newShader->link())
-		{
-			shape = nullptr;
-			attributes = nullptr;
-			uniforms = nullptr;
-
-			shader = newShader;
-			shader->use();
-
-			shape = new Shape(openGLContext);
-			attributes = new Attributes(openGLContext, *shader);
-			uniforms = new Uniforms(openGLContext, *shader);
-
-			statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
-		}
-		else
-		{
-			statusText = newShader->getLastError();
-		}
-
-		if (statusLabel != nullptr)
-			statusLabel->setText(statusText, dontSendNotification);
-
-		isShaderCompileReady = false;
-	}
-
-	void updateShader()
-	{
-		if (newVertexShader.isNotEmpty() || newFragmentShader.isNotEmpty())
-		{
-			ScopedPointer<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
-			String statusText;
-
-			if (newShader->addVertexShader(OpenGLHelpers::translateVertexShaderToV3(newVertexShader))
-				&& newShader->addFragmentShader(OpenGLHelpers::translateFragmentShaderToV3(newFragmentShader))
-				&& newShader->link())
-			{
-				shape = nullptr;
-				attributes = nullptr;
-				uniforms = nullptr;
-
-				shader = newShader;
-				shader->use();
-
-				shape = new Shape(openGLContext);
-				attributes = new Attributes(openGLContext, *shader);
-				uniforms = new Uniforms(openGLContext, *shader);
-
-				statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
-			}
-			else
-			{
-				statusText = newShader->getLastError();
-			}
-
-			if(statusLabel != nullptr)
-				statusLabel->setText(statusText, dontSendNotification);
-
-			newVertexShader = String();
-			newFragmentShader = String();
-
-			isShaderCompileReady = false;
-		}
-	}
-
-	void mouseDrag(const MouseEvent& event)
-	{
-		mouseX = event.getPosition().getX();
-		mouseY = event.getPosition().getY();
-	}
-
-	Matrix3D<float> getProjectionMatrix() const
-	{
-		float w = 1.0f / (0.5f + 0.1f);
-		float h = w * getLocalBounds().toFloat().getAspectRatio(false);
-		return Matrix3D<float>::fromFrustum(-w, w, -h, h, 4.0f, 30.0f);
-	}
-
-	Matrix3D<float> getViewMatrix() const
-	{
-		Matrix3D<float> viewMatrix(Vector3D<float>(0.0f, 0.0f, -5.0f /*-10.0f*/));
-		Matrix3D<float> rotationMatrix = viewMatrix.rotated(Vector3D<float>(-0.3f, 5.0f * std::sin(getFrameCounter() * 0.01f), 0.0f));
-
-		return /*rotationMatrix * */viewMatrix;
-	}
-
-    //==============================================================================
     // This class just manages the attributes that the shaders use.
 	// シェーダーのattributes変数のポインタを取得
     struct Attributes
@@ -551,7 +309,8 @@ private:
 
 	Label* statusLabel;
 	CodeDocument* fragmentDoc;
-	
+	AudioProcessorEditor* editor;
+
     ScopedPointer<OpenGLShaderProgram> shader;
     ScopedPointer<Shape> shape;
     ScopedPointer<Attributes> attributes;

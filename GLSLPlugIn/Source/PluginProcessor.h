@@ -12,7 +12,10 @@
 #define PLUGINPROCESSOR_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "StaticValues.h"
 
+#include "PlayerWindow.h"
+#include <queue>
 
 //==============================================================================
 /**
@@ -58,10 +61,10 @@ public:
 
 private:
     //==============================================================================
+	//ScopedPointer<PlayerWindow> playerWindow;
+	PlayerWindow* playerWindow;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessor)
 };
-
-static String ShaderCache;
-static bool isShaderCacheReady = false;
 
 #endif  // PLUGINPROCESSOR_H_INCLUDED

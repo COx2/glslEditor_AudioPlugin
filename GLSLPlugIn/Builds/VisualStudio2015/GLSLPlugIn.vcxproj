@@ -131,6 +131,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\StaticValues.cpp"/>
+    <ClCompile Include="..\..\Source\GLSLComponent.cpp"/>
+    <ClCompile Include="..\..\Source\PlayerWindow.cpp"/>
     <ClCompile Include="..\..\Source\PluginProcessor.cpp"/>
     <ClCompile Include="..\..\Source\PluginEditor.cpp"/>
     <ClCompile Include="C:\SDKs\ROLI\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
@@ -1788,6 +1791,8 @@
     <ClCompile Include="..\..\JuceLibraryCode\juce_video.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\StaticValues.h"/>
+    <ClInclude Include="..\..\Source\PlayerWindow.h"/>
     <ClInclude Include="..\..\Source\GLSLComponent.h"/>
     <ClInclude Include="..\..\Source\Resources\WavefrontObjParser.h"/>
     <ClInclude Include="..\..\Source\PluginProcessor.h"/>
