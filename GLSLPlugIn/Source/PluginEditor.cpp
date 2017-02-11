@@ -44,6 +44,23 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	m_statusLabel.setFont(Font(14.0f));
 	addAndMakeVisible(m_statusLabel);
 
+	m_SyncModeSwitch.setLookAndFeel(new LookAndFeel_V3());
+	m_SyncModeSwitch.setToggleState(false, dontSendNotification);
+	m_SyncModeSwitch.setColour(Label::backgroundColourId, Colours::darkcyan);
+	m_SyncModeSwitch.setColour(Label::textColourId, Colours::white);
+	m_SyncModeSwitch.setButtonText("Auto Sync");
+	m_SyncModeSwitch.setName("AUTO_MODE");
+	m_SyncModeSwitch.addListener(this);
+	addAndMakeVisible(m_SyncModeSwitch);
+
+	m_SyncButton.setLookAndFeel(new LookAndFeel_V3());
+	m_SyncButton.setColour(Label::backgroundColourId, Colours::darkmagenta);
+	m_SyncButton.setColour(Label::textColourId, Colours::white);
+	m_SyncButton.setButtonText("Sync Player");
+	m_SyncButton.setName("SYNC");
+	m_SyncButton.addListener(this);
+	addAndMakeVisible(m_SyncButton);
+
 	startTimer(15);
 
 	if (StaticValues::getShaderCacheReady())
@@ -60,6 +77,7 @@ GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()
 //==============================================================================
 void GlslplugInAudioProcessorEditor::paint (Graphics& g)
 {
+	g.fillAll(Colours::darkcyan);
 }
 
 void GlslplugInAudioProcessorEditor::resized()
@@ -71,7 +89,11 @@ void GlslplugInAudioProcessorEditor::resized()
     // subcomponents in your editor..
 	m_GLSLCompo.setBounds(0, 0, 800, 600);
 
-	fragmentEditorComp.setBounds(800, 0, 640, 540);
+	fragmentEditorComp.setBounds(800, 0, 640, 520);
+
+	m_SyncModeSwitch.setBounds(800, 520, 320, 20);
+	
+	m_SyncButton.setBounds(1120, 520, 320, 20);
 
 	m_statusLabel.setBounds(800, 540, 640, 60);
 
@@ -79,12 +101,16 @@ void GlslplugInAudioProcessorEditor::resized()
 	{
 		fragmentEditorComp.setVisible(true);
 		m_statusLabel.setVisible(true);
+		m_SyncModeSwitch.setVisible(true);
+		m_SyncButton.setVisible(true);
 		this->setSize(1440, 600);
 	}
 	else
 	{
 		fragmentEditorComp.setVisible(false);
 		m_statusLabel.setVisible(false);
+		m_SyncModeSwitch.setVisible(false);
+		m_SyncButton.setVisible(false);
 		this->setSize(800, 600);
 	}
 }
@@ -102,7 +128,8 @@ void GlslplugInAudioProcessorEditor::timerCallback()
 
 		m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
 
-		setShaderSync();
+		if(isShaderSyncAuto)
+			setShaderSync();
 
 		startTimer(60);
 	}
@@ -220,4 +247,17 @@ bool GlslplugInAudioProcessorEditor::keyPressed(const KeyPress& key, Component* 
 		}
 	}
 	return true;
+}
+
+void GlslplugInAudioProcessorEditor::buttonClicked(Button* _button)
+{
+	if (_button->getName() == "SYNC")
+	{
+		setShaderSync();
+	}
+	if (_button->getName() == "AUTO_MODE")
+	{
+		isShaderSyncAuto = _button->getToggleState();
+		setShaderSync();
+	}
 }

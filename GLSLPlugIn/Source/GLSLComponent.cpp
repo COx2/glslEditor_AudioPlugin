@@ -82,7 +82,7 @@ void GLSLComponent::render()
 	}
 
 	if (uniforms->resolution != nullptr) {
-		uniforms->resolution->set(800, 600);
+		uniforms->resolution->set(getWidth(), getHeight());
 	}
 
 	if (uniforms->mouse != nullptr) {

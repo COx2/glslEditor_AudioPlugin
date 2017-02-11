@@ -21,6 +21,7 @@
 class GlslplugInAudioProcessorEditor  : public AudioProcessorEditor,
 										public CodeDocument::Listener,
 										public KeyListener,
+										public ButtonListener,										
 										private Timer
 {
 public:
@@ -30,30 +31,29 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
-	
-	Label m_statusLabel;
-	CodeDocument /*vertexDocument,*/ fragmentDocument;
-	CodeEditorComponent /*vertexEditorComp,*/ fragmentEditorComp;
-
 	void timerCallback() override;
 	void setMidiCCValue(juce::MidiMessage midiCC);
 	void setShaderSync();
-
-	enum
-	{
-		fftOrder = 9,
-		fftSize = 1 << fftOrder
-	};
-
 	void pushNextSampleIntoFifo(float sample) noexcept;
-	
+
 	GlslplugInAudioProcessor& processor;
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
 	GLSLComponent m_GLSLCompo;
+	Label m_statusLabel;
+	CodeDocument /*vertexDocument,*/ fragmentDocument;
+	CodeEditorComponent /*vertexEditorComp,*/ fragmentEditorComp;
+	ToggleButton m_SyncModeSwitch;
+	TextButton m_SyncButton;
+
 	enum { shaderLinkDelay = 500 };
+	enum
+	{
+		fftOrder = 9,
+		fftSize = 1 << fftOrder
+	};
 	void codeDocumentTextInserted(const String& /*newText*/, int /*insertIndex*/) override;
 	void codeDocumentTextDeleted(int /*startIndex*/, int /*endIndex*/) override;
 
@@ -78,8 +78,12 @@ private:
 	//bool keyPressed(const KeyPress& key) override;
 	// ‘–‚é‚Ì‚Í‚±‚Á‚¿
 	bool keyPressed(const KeyPress& key, Component* originatingComponent) override;
+	
+	/** Called when the button is clicked. */
+	virtual void buttonClicked(Button*) override;
+	
+	bool isShaderSyncAuto = false;
 	bool isCodeEditorShow = true;
-
 	bool isNeedShaderCompile = false;
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessorEditor)
