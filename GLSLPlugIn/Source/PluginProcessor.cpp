@@ -26,12 +26,23 @@ GlslplugInAudioProcessor::GlslplugInAudioProcessor()
 	StaticValues::setShaderCache("");
 	StaticValues::setShaderCacheReady(false);
 
-	playerWindow = new PlayerWindow("GLSL Player");
 }
 
 GlslplugInAudioProcessor::~GlslplugInAudioProcessor()
 {
 	delete playerWindow; // (deletes our window)
+}
+
+void GlslplugInAudioProcessor::createPlayerWindow()
+{
+	playerWindow = nullptr;
+	playerWindow = new PlayerWindow("GLSL Player");
+}
+
+void GlslplugInAudioProcessor::deletePlayerWindow()
+{
+	delete playerWindow;
+	playerWindow = nullptr;
 }
 
 //==============================================================================

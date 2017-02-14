@@ -47,6 +47,7 @@ private:
 	CodeEditorComponent /*vertexEditorComp,*/ fragmentEditorComp;
 	ToggleButton m_SyncModeSwitch;
 	TextButton m_SyncButton;
+	TextButton m_PlayWndButton;
 
 	enum { shaderLinkDelay = 500 };
 	enum

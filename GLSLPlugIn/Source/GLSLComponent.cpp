@@ -38,6 +38,7 @@ void GLSLComponent::initialise()
 
 		createShaders();
 	}
+	isInitialised = true;
 }
 
 void GLSLComponent::shutdown()
@@ -50,10 +51,16 @@ void GLSLComponent::shutdown()
 
 void GLSLComponent::render()
 {
-	if (isShaderCompileReady)
-		updateShader();
+	if (!openGLContext.isAttached())
+		return;
+
+	if (!openGLContext.isActive())
+		return;
 
 	jassert(OpenGLHelpers::isContextActive());
+
+	if (isShaderCompileReady)
+		updateShader();
 
 	const float desktopScale = (float)openGLContext.getRenderingScale();
 	OpenGLHelpers::clear(Colour::greyLevel(0.1f));
@@ -194,6 +201,12 @@ void GLSLComponent::setWaveValue(int waveNumber, float value)
 //==============================================================================
 void GLSLComponent::createShaders()
 {
+	if (!openGLContext.isAttached())
+		return;
+
+	if (!openGLContext.isActive())
+		return;
+
 	ScopedPointer<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
 	String statusText;
 
@@ -227,6 +240,12 @@ void GLSLComponent::createShaders()
 
 void GLSLComponent::updateShader()
 {
+	if (!openGLContext.isAttached())
+		return;
+
+	if (!openGLContext.isActive())
+		return;
+
 	if (newVertexShader.isNotEmpty() || newFragmentShader.isNotEmpty())
 	{
 		ScopedPointer<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));

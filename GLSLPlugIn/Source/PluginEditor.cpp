@@ -61,7 +61,15 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	m_SyncButton.addListener(this);
 	addAndMakeVisible(m_SyncButton);
 
-	startTimer(15);
+	m_PlayWndButton.setLookAndFeel(new LookAndFeel_V3());
+	m_PlayWndButton.setColour(Label::backgroundColourId, Colours::darkmagenta);
+	m_PlayWndButton.setColour(Label::textColourId, Colours::white);
+	m_PlayWndButton.setButtonText("Player Window");
+	m_PlayWndButton.setName("PLAY_WND");
+	m_PlayWndButton.addListener(this);
+	addAndMakeVisible(m_PlayWndButton);
+
+	startTimer(shaderLinkDelay);
 
 	if (StaticValues::getShaderCacheReady())
 	{
@@ -91,9 +99,11 @@ void GlslplugInAudioProcessorEditor::resized()
 
 	fragmentEditorComp.setBounds(800, 0, 640, 520);
 
-	m_SyncModeSwitch.setBounds(800, 520, 320, 20);
+	m_SyncModeSwitch.setBounds(800, 520, 200, 20);
 	
-	m_SyncButton.setBounds(1120, 520, 320, 20);
+	m_SyncButton.setBounds(1000, 520, 220, 20);
+
+	m_PlayWndButton.setBounds(1220, 520, 220, 20);
 
 	m_statusLabel.setBounds(800, 540, 640, 60);
 
@@ -103,6 +113,7 @@ void GlslplugInAudioProcessorEditor::resized()
 		m_statusLabel.setVisible(true);
 		m_SyncModeSwitch.setVisible(true);
 		m_SyncButton.setVisible(true);
+		m_PlayWndButton.setVisible(true);
 		this->setSize(1440, 600);
 	}
 	else
@@ -111,6 +122,7 @@ void GlslplugInAudioProcessorEditor::resized()
 		m_statusLabel.setVisible(false);
 		m_SyncModeSwitch.setVisible(false);
 		m_SyncButton.setVisible(false);
+		m_PlayWndButton.setVisible(false);
 		this->setSize(800, 600);
 	}
 }
@@ -126,12 +138,13 @@ void GlslplugInAudioProcessorEditor::timerCallback()
 		
 		StaticValues::setShaderCache(fragmentDocument.getAllContent());
 
-		m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
+		if (m_GLSLCompo.isInitialised)
+			m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
 
 		if(isShaderSyncAuto)
 			setShaderSync();
 
-		startTimer(60);
+		startTimer(shaderLinkDelay);
 	}
 
 	// MIDI CC
@@ -177,7 +190,8 @@ void GlslplugInAudioProcessorEditor::sendMidiCCValue()
 	{
 		juce::MidiMessage midiCC = m_midiCCqueue.front();
 		m_midiCCqueue.pop();
-		m_GLSLCompo.setMidiCCValue(midiCC.getControllerNumber(), midiCC.getControllerValue());
+		if (m_GLSLCompo.isInitialised)
+			m_GLSLCompo.setMidiCCValue(midiCC.getControllerNumber(), midiCC.getControllerValue());
 	}
 }
 
@@ -222,7 +236,8 @@ void GlslplugInAudioProcessorEditor::sendNextSpectrum()
 	for (int i = 0; i < fftSize; i++) 
 	{
 		auto spectrumVal = fftData[i];
-		m_GLSLCompo.setSpectrumValue(i, spectrumVal * spectrumVal);
+		if (m_GLSLCompo.isInitialised)
+			m_GLSLCompo.setSpectrumValue(i, spectrumVal * spectrumVal);
 	}
 }
 
@@ -230,7 +245,8 @@ void GlslplugInAudioProcessorEditor::sendNextWave()
 {
 	for (int i = 0; i < fftSize; i++)
 	{
-		m_GLSLCompo.setWaveValue(i, waveData[i]);
+		if (m_GLSLCompo.isInitialised)
+			m_GLSLCompo.setWaveValue(i, waveData[i]);
 	}
 }
 
@@ -259,5 +275,12 @@ void GlslplugInAudioProcessorEditor::buttonClicked(Button* _button)
 	{
 		isShaderSyncAuto = _button->getToggleState();
 		setShaderSync();
+	}
+	if (_button->getName() == "PLAY_WND")
+	{
+		if (processor.existPlayerWindow())
+			processor.deletePlayerWindow();
+		else
+			processor.createPlayerWindow();
 	}
 }

@@ -28,11 +28,14 @@ PlayerWindow::PlayerWindow(String name)
 	setContentOwned(&m_GLSLCompo, true);
 
 	setVisible(true);
-	startTimer(60);
+	startTimer(shaderLinkDelay);
 }
 
 PlayerWindow::~PlayerWindow()
 {
+	setContentNonOwned(&m_GLSLCompo, true);
+	m_GLSLCompo.openGLContext.detach();
+	m_GLSLCompo.shutdown();
 }
 
 void PlayerWindow::closeButtonPressed()
@@ -79,9 +82,10 @@ void PlayerWindow::timerCallback()
 		
 		stopTimer();
 
-		m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
+		if(m_GLSLCompo.isInitialised)
+			m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
 		
-		startTimer(60);
+		startTimer(shaderLinkDelay);
 	}
 
 	// MIDI CC

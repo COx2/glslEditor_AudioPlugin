@@ -53,6 +53,8 @@ public:
 
 	void setWaveValue(int waveNumber, float value);
 
+	bool isInitialised = false;
+
 private:
 	//==============================================================================
 	void createShaders();
