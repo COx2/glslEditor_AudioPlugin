@@ -1,4 +1,4 @@
-﻿/*
+/*
   ==============================================================================
 
     GLSLComponent.cpp
@@ -23,7 +23,6 @@ GLSLComponent::~GLSLComponent()
 
 void GLSLComponent::initialise()
 {
-	// Shaderがnullにならないように代入しておく
 	vertexShader = defaultVertexShader;
 	fragmentShader = defaultFragmentShader;
 
@@ -77,7 +76,6 @@ void GLSLComponent::render()
 	//////////////////////  FragmentShader   ////////////////
 
 	if (uniforms->time != nullptr) {
-		auto s = sinf(timeCounter);
 		uniforms->time->set(timeCounter);
 	}
 

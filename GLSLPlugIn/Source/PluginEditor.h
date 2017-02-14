@@ -74,9 +74,7 @@ private:
 	float waveData[fftSize];
 
 	// KeyListener
-	// ‚±‚Á‚¿‚Í‘–‚ç‚¸
 	//bool keyPressed(const KeyPress& key) override;
-	// ‘–‚é‚Ì‚Í‚±‚Á‚¿
 	bool keyPressed(const KeyPress& key, Component* originatingComponent) override;
 	
 	/** Called when the button is clicked. */

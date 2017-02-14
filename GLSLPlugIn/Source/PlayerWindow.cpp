@@ -18,8 +18,6 @@ PlayerWindow::PlayerWindow(String name)
 {
 	addKeyListener(this);
 
-	// nativeTitleBar = false‚ÅA
-	// resizued, paint‚ğoverride‚·‚é‚Æ•`‰æ‚³‚ê‚È‚¢’ˆÓ
 	setUsingNativeTitleBar(false);
 	setTitleBarHeight(TITLEBAR_HEIGHT);
 

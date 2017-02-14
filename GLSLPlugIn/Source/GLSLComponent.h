@@ -7,17 +7,6 @@
 
   ==============================================================================
 */
-
-//#include "GLSLComponent.h"
-
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-  ==============================================================================
-*/
-
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
@@ -84,7 +73,6 @@ private:
     
 	//==============================================================================
     // This class just manages the attributes that the shaders use.
-	// シェーダーのattributes変数のポインタを取得
     struct Attributes
     {
         Attributes (OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
@@ -146,7 +134,6 @@ private:
 
     //==============================================================================
     // This class just manages the uniform values that the demo shaders use.
-	// シェーダーのuniform変数のポインタを取得
     struct Uniforms
     {
         Uniforms (OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
@@ -161,7 +148,6 @@ private:
 			wave = createUniform(openGLContext, shaderProgram, "wave");
         }
 
-		// 追加したいUniform変数を宣言 ポインタを格納する
 		ScopedPointer<OpenGLShaderProgram::Uniform>
 			projectionMatrix, viewMatrix, time, resolution, mouse, midiCC, wave, waveL, waveR, spectrum, spectrumL, spectrumR;
 
@@ -233,9 +219,7 @@ private:
 			{
 				//numIndices = aShape.mesh.indices.size();
 				numIndices = _vertices.size();
-				// VBO¶¬
 				openGLContext.extensions.glGenBuffers(1, &vertexBuffer);
-				// VBO•R‚Ã‚¯
 				openGLContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 
 				Array<Vertex> vertices;
