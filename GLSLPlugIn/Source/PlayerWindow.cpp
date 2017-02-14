@@ -34,8 +34,6 @@ PlayerWindow::PlayerWindow(String name)
 PlayerWindow::~PlayerWindow()
 {
 	setContentNonOwned(&m_GLSLCompo, true);
-	m_GLSLCompo.openGLContext.detach();
-	m_GLSLCompo.shutdown();
 }
 
 void PlayerWindow::closeButtonPressed()

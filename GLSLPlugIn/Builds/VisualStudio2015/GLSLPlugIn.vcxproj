@@ -41,8 +41,10 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">GLSLPlugIn</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">GLSLPlugIn</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
@@ -642,6 +644,9 @@
     <ClCompile Include="C:\SDKs\ROLI\JUCE\modules\juce_core\containers\juce_DynamicObject.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="C:\SDKs\ROLI\JUCE\modules\juce_core\containers\juce_ListenerList.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="C:\SDKs\ROLI\JUCE\modules\juce_core\containers\juce_NamedValueSet.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -775,6 +780,9 @@
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="C:\SDKs\ROLI\JUCE\modules\juce_core\network\juce_URL.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="C:\SDKs\ROLI\JUCE\modules\juce_core\network\juce_WebInputStream.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="C:\SDKs\ROLI\JUCE\modules\juce_core\streams\juce_BufferedInputStream.cpp">
@@ -2091,6 +2099,7 @@
     <ClInclude Include="C:\SDKs\ROLI\JUCE\modules\juce_core\network\juce_NamedPipe.h"/>
     <ClInclude Include="C:\SDKs\ROLI\JUCE\modules\juce_core\network\juce_Socket.h"/>
     <ClInclude Include="C:\SDKs\ROLI\JUCE\modules\juce_core\network\juce_URL.h"/>
+    <ClInclude Include="C:\SDKs\ROLI\JUCE\modules\juce_core\network\juce_WebInputStream.h"/>
     <ClInclude Include="C:\SDKs\ROLI\JUCE\modules\juce_core\streams\juce_BufferedInputStream.h"/>
     <ClInclude Include="C:\SDKs\ROLI\JUCE\modules\juce_core\streams\juce_FileInputSource.h"/>
     <ClInclude Include="C:\SDKs\ROLI\JUCE\modules\juce_core\streams\juce_InputSource.h"/>

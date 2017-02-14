@@ -59,7 +59,7 @@ private:
 	//==============================================================================
 	void createShaders();
 	void updateShader();
-	void mouseDrag(const MouseEvent& event);
+	void mouseDrag(const MouseEvent& event) override;
 
 	Matrix3D<float> getProjectionMatrix() const;
 	Matrix3D<float> getViewMatrix() const;

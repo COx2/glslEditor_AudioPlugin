@@ -35,7 +35,6 @@ GlslplugInAudioProcessor::~GlslplugInAudioProcessor()
 
 void GlslplugInAudioProcessor::createPlayerWindow()
 {
-	playerWindow = nullptr;
 	playerWindow = new PlayerWindow("GLSL Player");
 }
 

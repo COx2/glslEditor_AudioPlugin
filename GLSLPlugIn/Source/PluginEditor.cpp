@@ -15,10 +15,10 @@
 //==============================================================================
 GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p),
+	fragmentEditorComp(fragmentDocument, nullptr),
 	forwardFFT(fftOrder, false),
 	fifoIndex(0),
-	nextFFTBlockReady(false),
-	fragmentEditorComp(fragmentDocument, nullptr)
+	nextFFTBlockReady(false)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -69,13 +69,14 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	m_PlayWndButton.addListener(this);
 	addAndMakeVisible(m_PlayWndButton);
 
-	startTimer(shaderLinkDelay);
-
 	if (StaticValues::getShaderCacheReady())
 	{
 		fragmentDocument.replaceAllContent(StaticValues::getShaderCache());
 	}
-
+	else
+	{
+		startTimer(shaderLinkDelay);
+	}
 }
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()

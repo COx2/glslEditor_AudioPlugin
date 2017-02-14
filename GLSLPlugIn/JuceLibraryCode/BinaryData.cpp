@@ -9,39 +9,25 @@ namespace BinaryData
 
 //================== base.obj ==================
 static const unsigned char temp_binary_data_0[] =
-"# cube.obj\r\n"
 "#\r\n"
-" \r\n"
-"g cube\r\n"
-" \r\n"
-"v  -1.0  -1.0  0.0\r\n"
-"v  -1.0  -1.0  1.0\r\n"
-"v  -1.0  1.0  0.0\r\n"
-"v  -1.0  1.0  1.0\r\n"
-"v  1.0  -1.0  0.0\r\n"
-"v  1.0  -1.0  1.0\r\n"
-"v  1.0  1.0  0.0\r\n"
-"v  1.0  1.0  1.0\r\n"
+"#\r\n"
+"#\r\n"
 "\r\n"
-"vn  0.0  0.0  1.0\r\n"
-"vn  0.0  0.0 -1.0\r\n"
-"vn  0.0  1.0  0.0\r\n"
-"vn  0.0 -1.0  0.0\r\n"
-"vn  1.0  0.0  0.0\r\n"
-"vn -1.0  0.0  0.0\r\n"
-" \r\n"
-"f  1//2  7//2  5//2\r\n"
-"f  1//2  3//2  7//2 \r\n"
-"f  1//6  4//6  3//6 \r\n"
-"f  1//6  2//6  4//6 \r\n"
-"f  3//3  8//3  7//3 \r\n"
-"f  3//3  4//3  8//3 \r\n"
-"f  5//5  7//5  8//5 \r\n"
-"f  5//5  8//5  6//5 \r\n"
-"f  1//4  5//4  6//4 \r\n"
-"f  1//4  6//4  2//4 \r\n"
-"f  2//1  6//1  8//1 \r\n"
-"f  2//1  8//1  4//1 ";
+"mtllib base.mtl\r\n"
+"\r\n"
+"\r\n"
+"#\r\n"
+"# cube \xe3\x83\xa1\xe3\x83\x83\xe3\x82\xb7\xe3\x83\xa5\r\n"
+"#\r\n"
+"g cube \xe3\x83\xa1\xe3\x83\x83\xe3\x82\xb7\xe3\x83\xa5\r\n"
+"\r\n"
+"v -1.000000 -1.000000 0.000000\r\n"
+"v 1.000000 1.000000 0.000000\r\n"
+"v 1.000000 -1.000000 0.000000\r\n"
+"v -1.000000 1.000000 0.000000\r\n"
+"vn 0.000000 0.000000 -1.000000\r\n"
+"f 1//1 2//1 3//1\r\n"
+"f 1//1 4//1 2//1\r\n";
 
 const char* base_obj = (const char*) temp_binary_data_0;
 
@@ -56,7 +42,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes) throw
 
     switch (hash)
     {
-        case 0x99691289:  numBytes = 561; return base_obj;
+        case 0x99691289:  numBytes = 274; return base_obj;
         default: break;
     }
 
