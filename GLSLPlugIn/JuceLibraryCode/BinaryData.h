@@ -10,7 +10,7 @@
 namespace BinaryData
 {
     extern const char*   base_obj;
-    const int            base_objSize = 274;
+    const int            base_objSize = 203;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

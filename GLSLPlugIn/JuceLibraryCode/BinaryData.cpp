@@ -9,17 +9,7 @@ namespace BinaryData
 
 //================== base.obj ==================
 static const unsigned char temp_binary_data_0[] =
-"#\r\n"
-"#\r\n"
-"#\r\n"
-"\r\n"
-"mtllib base.mtl\r\n"
-"\r\n"
-"\r\n"
-"#\r\n"
-"# cube \xe3\x83\xa1\xe3\x83\x83\xe3\x82\xb7\xe3\x83\xa5\r\n"
-"#\r\n"
-"g cube \xe3\x83\xa1\xe3\x83\x83\xe3\x82\xb7\xe3\x83\xa5\r\n"
+"g board\r\n"
 "\r\n"
 "v -1.000000 -1.000000 0.000000\r\n"
 "v 1.000000 1.000000 0.000000\r\n"
@@ -42,7 +32,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes) throw
 
     switch (hash)
     {
-        case 0x99691289:  numBytes = 274; return base_obj;
+        case 0x99691289:  numBytes = 203; return base_obj;
         default: break;
     }
 
