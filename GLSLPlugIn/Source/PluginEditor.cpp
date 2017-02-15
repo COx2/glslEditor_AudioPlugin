@@ -146,7 +146,7 @@ void GlslplugInAudioProcessorEditor::timerCallback()
 		if(isShaderSyncAuto)
 			setShaderSync();
 
-		startTimer(shaderLinkDelay);
+		startTimer(60);
 	}
 
 	// MIDI CC
