@@ -55,6 +55,9 @@ private:
 	const int TITLEBAR_HEIGHT = 26;
 	GLSLComponent m_GLSLCompo;
 
+	Label m_statusLabel;
+	CodeDocument /*vertexDocument,*/ fragmentDocument;
+
 	enum { shaderLinkDelay = 500 };
 
 	std::queue<juce::MidiMessage> m_midiCCqueue;

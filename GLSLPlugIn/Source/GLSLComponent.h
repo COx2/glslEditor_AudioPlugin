@@ -120,7 +120,7 @@ private:
             if (texureCoordIn != nullptr)  openGLContext.extensions.glDisableVertexAttribArray (texureCoordIn->attributeID);
         }
 
-        ScopedPointer<OpenGLShaderProgram::Attribute> position, normal, sourceColour, texureCoordIn;
+        OpenGLShaderProgram::Attribute *position, *normal, *sourceColour, *texureCoordIn;
 
     private:
         static OpenGLShaderProgram::Attribute* createAttribute (OpenGLContext& openGLContext,
@@ -150,8 +150,8 @@ private:
 			wave = createUniform(openGLContext, shaderProgram, "wave");
         }
 
-		ScopedPointer<OpenGLShaderProgram::Uniform>
-			projectionMatrix, viewMatrix, time, resolution, mouse, midiCC, wave, waveL, waveR, spectrum, spectrumL, spectrumR;
+		OpenGLShaderProgram::Uniform
+			*projectionMatrix, *viewMatrix, *time, *resolution, *mouse, *midiCC, *wave, *waveL, *waveR, *spectrum, *spectrumL, *spectrumR;
 
     private:
         static OpenGLShaderProgram::Uniform* createUniform (OpenGLContext& openGLContext,
@@ -173,8 +173,6 @@ private:
     {
         Shape (OpenGLContext& openGLContext)
         {
-			
-            //if (shapeFile.load (BinaryData::teapot_obj).wasOk())
 			if (shapeFile.load(BinaryData::base_obj).wasOk())
                 for (int i = 0; i < shapeFile.shapes.size(); ++i)
                     vertexBuffers.add (new VertexBuffer (openGLContext, *shapeFile.shapes.getUnchecked(i)));
@@ -217,28 +215,6 @@ private:
                                                        aShape.mesh.indices.getRawDataPointer(), GL_STATIC_DRAW);
             }
 
-			VertexBuffer(OpenGLContext& context, Array<Vertex> _vertices) : openGLContext(context)
-			{
-				//numIndices = aShape.mesh.indices.size();
-				numIndices = _vertices.size();
-				openGLContext.extensions.glGenBuffers(1, &vertexBuffer);
-				openGLContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-
-				Array<Vertex> vertices;
-				//createVertexListFromMesh(aShape.mesh, vertices, Colours::green);
-				vertices = _vertices;
-
-				openGLContext.extensions.glBufferData(GL_ARRAY_BUFFER,
-					static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(Vertex)),
-					vertices.getRawDataPointer(), GL_STATIC_DRAW);
-
-				openGLContext.extensions.glGenBuffers(1, &indexBuffer);
-				openGLContext.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-				openGLContext.extensions.glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
-					static_cast<GLsizeiptr> (static_cast<size_t> (numIndices) * sizeof(juce::uint32)), 
-					&vertices, GL_STATIC_DRAW);
-			}
-
             ~VertexBuffer()
             {
                 openGLContext.extensions.glDeleteBuffers (1, &vertexBuffer);
@@ -263,7 +239,7 @@ private:
 
         static void createVertexListFromMesh (const WavefrontObjFile::Mesh& mesh, Array<Vertex>& list, Colour colour)
         {
-			const float scale = 5.0f; //0.2f;
+			const float scale = 1.0f; //0.2f;
             WavefrontObjFile::TextureCoord defaultTexCoord = { 0.5f, 0.5f };
             WavefrontObjFile::Vertex defaultNormal = { 0.5f, 0.5f, 0.5f };
 
@@ -312,58 +288,7 @@ private:
 	float m_spectrum[256] = { 0 };
 	float m_wave[256] = { 0 };
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GLSLComponent)
-
-	const char* defaultVertexShader =
-		"attribute vec4 position;\n"
-		"attribute vec4 sourceColour;\n"
-		"attribute vec2 texureCoordIn;\n"
-		"attribute vec2 surfacePosAttrib;\n"
-		"\n"
-		"uniform mat4 projectionMatrix;\n"
-		"uniform mat4 viewMatrix;\n"
-		"\n"
-		"varying vec4 destinationColour;\n"
-		"varying vec2 textureCoordOut;\n"
-		"varying vec2 surfacePosition;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"    destinationColour = sourceColour;\n"
-		"    textureCoordOut = texureCoordIn;\n"
-		//"    gl_Position = projectionMatrix * viewMatrix * position;\n"
-
-		"    surfacePosition = surfacePosAttrib;\n"
-		"    gl_Position = vec4(position);\n"
-		"}\n";
-
-	const char* defaultFragmentShader =
-#if JUCE_OPENGL_ES
-		"varying lowp vec4 destinationColour;\n"
-		"varying lowp vec2 textureCoordOut;\n"
-#else
-		"varying vec4 destinationColour;\n"
-		"varying vec2 textureCoordOut;\n"
-#endif
-		"#extension GL_OES_standard_derivatives : enable\n"
-		"\n"
-		"uniform float time;\n"  /**/
-		"uniform vec2 mouse;\n" /**/
-		"uniform vec2 resolution;\n" /**/
-		"uniform float midiCC[128];\n"  /**/
-		"uniform float wave[256];\n" /**/
-		"uniform float spectrum[256];\n" /**/
-		"\n"
-		"#define pi 3.1415\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"    vec2 position = (gl_FragCoord.xy / resolution.xy);\n"
-		"    float r = abs(cos(position.x + time*position.y * spectrum[64]));\n"
-		"    float g = abs(sin(position.x - position.y + time + mouse.x));\n"
-		"    float b = abs(tan(position.y + time + mouse.y * wave[64]));\n"
-		"    gl_FragColor = vec4(r, g, b, 1.0);\n"
-		"}\n";
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GLSLComponent)
 };
 
 

@@ -16,6 +16,10 @@ PlayerWindow::PlayerWindow(String name)
 	fifoIndex(0),
 	nextFFTBlockReady(false)
 {
+	m_GLSLCompo.setStatusLabelPtr(&m_statusLabel);
+	m_GLSLCompo.setFragmentDocPtr(&fragmentDocument);
+	//m_GLSLCompo.setEditorPtr(this);
+
 	addKeyListener(this);
 
 	setUsingNativeTitleBar(false);
@@ -33,6 +37,7 @@ PlayerWindow::PlayerWindow(String name)
 
 PlayerWindow::~PlayerWindow()
 {
+	stopTimer();
 	setContentNonOwned(&m_GLSLCompo, true);
 }
 

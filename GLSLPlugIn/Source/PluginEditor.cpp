@@ -81,6 +81,7 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()
 {
+	stopTimer();
 }
 
 //==============================================================================

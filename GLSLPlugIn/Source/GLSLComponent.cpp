@@ -11,6 +11,59 @@
 #include "StaticValues.h"
 
 //==============================================================================
+static const char* defaultVertexShader =
+"attribute vec4 position;\n"
+"attribute vec4 sourceColour;\n"
+"attribute vec2 texureCoordIn;\n"
+"attribute vec2 surfacePosAttrib;\n"
+"\n"
+"uniform mat4 projectionMatrix;\n"
+"uniform mat4 viewMatrix;\n"
+"\n"
+"varying vec4 destinationColour;\n"
+"varying vec2 textureCoordOut;\n"
+"varying vec2 surfacePosition;\n"
+"\n"
+"void main()\n"
+"{\n"
+"    destinationColour = sourceColour;\n"
+"    textureCoordOut = texureCoordIn;\n"
+//"    gl_Position = projectionMatrix * viewMatrix * position;\n"
+
+"    surfacePosition = surfacePosAttrib;\n"
+"    gl_Position = vec4(position);\n"
+"}\n";
+
+static const char* defaultFragmentShader =
+#if JUCE_OPENGL_ES
+"varying lowp vec4 destinationColour;\n"
+"varying lowp vec2 textureCoordOut;\n"
+#else
+"varying vec4 destinationColour;\n"
+"varying vec2 textureCoordOut;\n"
+#endif
+"\n"
+"#extension GL_OES_standard_derivatives : enable\n"
+"\n"
+"uniform float time;\n"  /**/
+"uniform vec2 mouse;\n" /**/
+"uniform vec2 resolution;\n" /**/
+"uniform float midiCC[128];\n"  /**/
+"uniform float wave[256];\n" /**/
+"uniform float spectrum[256];\n" /**/
+"\n"
+"#define pi 3.1415\n"
+"\n"
+"void main()\n"
+"{\n"
+"    vec2 position = (gl_FragCoord.xy / resolution.xy);\n"
+"    float r = abs(cos(position.x + time*position.y * spectrum[64]));\n"
+"    float g = abs(sin(position.x - position.y + time + mouse.x));\n"
+"    float b = abs(tan(position.y + time + mouse.y * wave[64]));\n"
+"    gl_FragColor = vec4(r, g, b, 1.0);\n"
+"}\n";
+
+//==============================================================================
 GLSLComponent::GLSLComponent()
 {
 	//setSize(800, 600);
