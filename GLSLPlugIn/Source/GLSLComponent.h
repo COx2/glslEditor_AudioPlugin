@@ -359,9 +359,9 @@ private:
 		"void main()\n"
 		"{\n"
 		"    vec2 position = (gl_FragCoord.xy / resolution.xy);\n"
-		"    float r = abs(cos(position.x + time*position.y * spectrum[position.x * 256]));\n"
+		"    float r = abs(cos(position.x + time*position.y * spectrum[64]));\n"
 		"    float g = abs(sin(position.x - position.y + time + mouse.x));\n"
-		"    float b = abs(tan(position.y + time + mouse.y * wave[position.y * 256]));\n"
+		"    float b = abs(tan(position.y + time + mouse.y * wave[64]));\n"
 		"    gl_FragColor = vec4(r, g, b, 1.0);\n"
 		"}\n";
 };
