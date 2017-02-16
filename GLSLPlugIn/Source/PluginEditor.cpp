@@ -270,12 +270,16 @@ bool GlslplugInAudioProcessorEditor::keyPressed(const KeyPress& key, Component* 
 		if (key.getKeyCode() == 43 || key.getKeyCode() == 59) // "+ or ;"
 		{
 			auto fs = fragmentEditorComp.getFont();
-			fragmentEditorComp.setFont(Font(fs.getHeight() + 1.0f));
+			if (fs.getHeight() < 52) {
+				fragmentEditorComp.setFont(Font(fs.getHeight() + 1.0f));
+			}
 		}
 		if (key.getKeyCode() == 45) // "-"
 		{
 			auto fs = fragmentEditorComp.getFont();
-			fragmentEditorComp.setFont(Font(fs.getHeight() - 1.0f));
+			if (fs.getHeight() > 7) {
+				fragmentEditorComp.setFont(Font(fs.getHeight() - 1.0f));
+			}
 		}
 	}
 	return true;
