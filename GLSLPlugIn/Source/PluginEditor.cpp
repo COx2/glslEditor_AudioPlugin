@@ -38,7 +38,6 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 
 	fragmentEditorComp.setColour(CodeEditorComponent::backgroundColourId, editorBackground);
 	fragmentEditorComp.setColour(CodeEditorComponent::defaultTextColourId, editorForeground);
-	fragmentEditorComp.setFont(Font(12.0f));
 	fragmentDocument.addListener(this);
 	addAndMakeVisible(fragmentEditorComp);
 
@@ -150,7 +149,7 @@ void GlslplugInAudioProcessorEditor::timerCallback()
 		if(isShaderSyncAuto)
 			setShaderSync();
 
-		startTimer(60);
+		startTimer(20);
 	}
 
 	// MIDI CC

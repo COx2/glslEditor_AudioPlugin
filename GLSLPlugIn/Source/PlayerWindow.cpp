@@ -88,7 +88,7 @@ void PlayerWindow::timerCallback()
 		if(m_GLSLCompo.isInitialised)
 			m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
 		
-		startTimer(60);
+		startTimer(20);
 	}
 
 	// MIDI CC

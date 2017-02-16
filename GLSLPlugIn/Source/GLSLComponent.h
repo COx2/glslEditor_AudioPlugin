@@ -282,11 +282,10 @@ private:
 
     String newVertexShader, newFragmentShader;
 	bool isShaderCompileReady = false;
-
 	float mouseX, mouseY;
 	float m_midiCC[128] = {0};
-	float m_spectrum[256] = { 0 };
-	float m_wave[256] = { 0 };
+	float m_spectrum[256] = {0};
+	float m_wave[256] = {0};
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GLSLComponent)
 };

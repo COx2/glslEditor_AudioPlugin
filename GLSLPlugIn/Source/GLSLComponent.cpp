@@ -12,13 +12,15 @@
 
 //==============================================================================
 static const char* defaultVertexShader =
-"attribute vec4 position;\n"
+"attribute vec3 position;\n"
+"attribute vec3 normal;\n"
 "attribute vec4 sourceColour;\n"
 "attribute vec2 texureCoordIn;\n"
 "attribute vec2 surfacePosAttrib;\n"
 "\n"
 "uniform mat4 projectionMatrix;\n"
 "uniform mat4 viewMatrix;\n"
+"uniform vec2 resolution;\n"
 "\n"
 "varying vec4 destinationColour;\n"
 "varying vec2 textureCoordOut;\n"
@@ -28,10 +30,10 @@ static const char* defaultVertexShader =
 "{\n"
 "    destinationColour = sourceColour;\n"
 "    textureCoordOut = texureCoordIn;\n"
-//"    gl_Position = projectionMatrix * viewMatrix * position;\n"
-
-"    surfacePosition = surfacePosAttrib;\n"
-"    gl_Position = vec4(position);\n"
+"    mat4 trnsmat = mat4(1., 0., 0., 0., 0., resolution.y / resolution.x, 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.);\n"
+"    trnsmat = trnsmat*0.5;\n"
+"    surfacePosition = (vec4(position, 1.0) * trnsmat).xy;\n"
+"    gl_Position = vec4(position, 1.0);\n"
 "}\n";
 
 static const char* defaultFragmentShader =
@@ -340,6 +342,9 @@ void GLSLComponent::mouseDrag(const MouseEvent& event)
 {
 	mouseX = float(event.getPosition().getX()) / getWidth();
 	mouseY = 1.0f - float(event.getPosition().getY()) / getHeight();
+
+	std::min(std::max(0.0f, mouseX), 1.0f);
+	std::min(std::max(0.0f, mouseY), 1.0f);
 }
 
 Matrix3D<float> GLSLComponent::getProjectionMatrix() const
