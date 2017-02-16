@@ -233,8 +233,7 @@ void GlslplugInAudioProcessorEditor::pushNextSampleIntoFifo(float sample) noexce
 
 void GlslplugInAudioProcessorEditor::setShaderSync()
 {
-	if(m_GLSLCompo.isShaderCompileSuccess)
-		StaticValues::setNeedShaderSync(true);
+	StaticValues::setNeedShaderSync(true);
 }
 
 void GlslplugInAudioProcessorEditor::sendNextSpectrum()
