@@ -22,7 +22,7 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (1440, 600);
+    setSize (1000, 600);
 	getTopLevelComponent()->addKeyListener(this);
 
 	m_GLSLCompo.setStatusLabelPtr(&m_statusLabel);
@@ -32,22 +32,26 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 
 	Colour editorBackground(Colours::darkgrey);
 	Colour editorForeground(Colours::white);
+	
+	Colour windowBackground(Colours::darkcyan);
+	Colour windowForeground(Colours::white);
 
 	fragmentEditorComp.setColour(CodeEditorComponent::backgroundColourId, editorBackground);
 	fragmentEditorComp.setColour(CodeEditorComponent::defaultTextColourId, editorForeground);
+	fragmentEditorComp.setFont(Font(12.0f));
 	fragmentDocument.addListener(this);
 	addAndMakeVisible(fragmentEditorComp);
 
 	m_statusLabel.setJustificationType(Justification::topLeft);
-	m_statusLabel.setColour(Label::backgroundColourId, Colours::darkcyan);
-	m_statusLabel.setColour(Label::textColourId, Colours::white);
+	m_statusLabel.setColour(Label::backgroundColourId, windowBackground);
+	m_statusLabel.setColour(Label::textColourId, windowForeground);
 	m_statusLabel.setFont(Font(14.0f));
 	addAndMakeVisible(m_statusLabel);
 
 	m_SyncModeSwitch.setLookAndFeel(new LookAndFeel_V3());
 	m_SyncModeSwitch.setToggleState(false, dontSendNotification);
-	m_SyncModeSwitch.setColour(Label::backgroundColourId, Colours::darkcyan);
-	m_SyncModeSwitch.setColour(Label::textColourId, Colours::white);
+	m_SyncModeSwitch.setColour(Label::backgroundColourId, windowBackground);
+	m_SyncModeSwitch.setColour(Label::textColourId, windowForeground);
 	m_SyncModeSwitch.setButtonText("Auto Sync");
 	m_SyncModeSwitch.setName("AUTO_MODE");
 	m_SyncModeSwitch.addListener(this);
@@ -97,17 +101,17 @@ void GlslplugInAudioProcessorEditor::resized()
 
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-	m_GLSLCompo.setBounds(0, 0, 800, 600);
+	m_GLSLCompo.setBounds(0, 0, 600, 600);
 
-	fragmentEditorComp.setBounds(800, 0, 640, 520);
+	fragmentEditorComp.setBounds(600, 0, 400, 520);
 
-	m_SyncModeSwitch.setBounds(800, 520, 200, 20);
+	m_SyncModeSwitch.setBounds(600, 520, 100, 20);
 	
-	m_SyncButton.setBounds(1000, 520, 220, 20);
+	m_SyncButton.setBounds(700, 520, 150, 20);
 
-	m_PlayWndButton.setBounds(1220, 520, 220, 20);
+	m_PlayWndButton.setBounds(850, 520, 150, 20);
 
-	m_statusLabel.setBounds(800, 540, 640, 60);
+	m_statusLabel.setBounds(600, 540, 400, 60);
 
 	if (isCodeEditorShow)
 	{
@@ -116,7 +120,7 @@ void GlslplugInAudioProcessorEditor::resized()
 		m_SyncModeSwitch.setVisible(true);
 		m_SyncButton.setVisible(true);
 		m_PlayWndButton.setVisible(true);
-		this->setSize(1440, 600);
+		this->setSize(1000, 600);
 	}
 	else
 	{
@@ -125,7 +129,7 @@ void GlslplugInAudioProcessorEditor::resized()
 		m_SyncModeSwitch.setVisible(false);
 		m_SyncButton.setVisible(false);
 		m_PlayWndButton.setVisible(false);
-		this->setSize(800, 600);
+		this->setSize(600, 600);
 	}
 }
 
@@ -262,6 +266,16 @@ bool GlslplugInAudioProcessorEditor::keyPressed(const KeyPress& key, Component* 
 		{
 			isCodeEditorShow = !isCodeEditorShow;
 			this->resized();
+		}
+		if (key.getKeyCode() == 43 || key.getKeyCode() == 59) // "+ or ;"
+		{
+			auto fs = fragmentEditorComp.getFont();
+			fragmentEditorComp.setFont(Font(fs.getHeight() + 1.0f));
+		}
+		if (key.getKeyCode() == 45) // "-"
+		{
+			auto fs = fragmentEditorComp.getFont();
+			fragmentEditorComp.setFont(Font(fs.getHeight() - 1.0f));
 		}
 	}
 	return true;
