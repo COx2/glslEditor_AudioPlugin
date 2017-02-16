@@ -22,7 +22,7 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (1000, 600);
+    setSize (wndFullSizeW, wndFullSizeH);
 	getTopLevelComponent()->addKeyListener(this);
 
 	m_GLSLCompo.setStatusLabelPtr(&m_statusLabel);
@@ -100,35 +100,40 @@ void GlslplugInAudioProcessorEditor::resized()
 
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-	m_GLSLCompo.setBounds(0, 0, 600, 600);
+	int glSide = wndFullSizeH;
+	int glBottom = wndFullSizeH;
+	m_GLSLCompo.setBounds(0, 0, glSide, glBottom);
 
-	fragmentEditorComp.setBounds(600, 0, 400, 520);
+	int editorBottom = wndFullSizeH - 80;
+	int editorSide = wndFullSizeW - wndFullSizeH;
+	fragmentEditorComp.setBounds(glSide, 0, editorSide, editorBottom);
 
-	m_SyncModeSwitch.setBounds(600, 520, 100, 20);
+	m_statusLabel.setBounds(glSide, editorBottom, editorSide, 60);
+
+	m_SyncModeSwitch.setBounds(glSide, editorBottom + 60, 108, 20);
 	
-	m_SyncButton.setBounds(700, 520, 150, 20);
+	m_SyncButton.setBounds(glSide + 108, editorBottom + 60, 170, 20);
 
-	m_PlayWndButton.setBounds(850, 520, 150, 20);
+	m_PlayWndButton.setBounds(glSide + 278, editorBottom + 60, 170, 20);
 
-	m_statusLabel.setBounds(600, 540, 400, 60);
 
 	if (isCodeEditorShow)
 	{
 		fragmentEditorComp.setVisible(true);
-		m_statusLabel.setVisible(true);
 		m_SyncModeSwitch.setVisible(true);
 		m_SyncButton.setVisible(true);
 		m_PlayWndButton.setVisible(true);
-		this->setSize(1000, 600);
+		m_statusLabel.setVisible(true);
+		this->setSize(wndFullSizeW, wndFullSizeH);
 	}
 	else
 	{
 		fragmentEditorComp.setVisible(false);
-		m_statusLabel.setVisible(false);
 		m_SyncModeSwitch.setVisible(false);
 		m_SyncButton.setVisible(false);
 		m_PlayWndButton.setVisible(false);
-		this->setSize(600, 600);
+		m_statusLabel.setVisible(false);
+		this->setSize(glSide, glBottom);
 	}
 }
 
@@ -228,7 +233,8 @@ void GlslplugInAudioProcessorEditor::pushNextSampleIntoFifo(float sample) noexce
 
 void GlslplugInAudioProcessorEditor::setShaderSync()
 {
-	StaticValues::setNeedShaderSync(true);
+	if(m_GLSLCompo.isShaderCompileSuccess)
+		StaticValues::setNeedShaderSync(true);
 }
 
 void GlslplugInAudioProcessorEditor::sendNextSpectrum()

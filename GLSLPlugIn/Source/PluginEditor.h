@@ -85,6 +85,9 @@ private:
 	bool isCodeEditorShow = true;
 	bool isNeedShaderCompile = false;
 	
+	int wndFullSizeW = 1024;
+	int wndFullSizeH = 576;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessorEditor)
 };
 

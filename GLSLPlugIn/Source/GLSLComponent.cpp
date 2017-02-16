@@ -83,7 +83,7 @@ void GLSLComponent::initialise()
 
 	if (StaticValues::getShaderCacheReady())
 	{
-		setShaderProgramFragment(StaticValues::getShaderCache());
+		setShaderProgramFragment(StaticValues::getShaderCacheVerified());
 		updateShader();
 	}
 	else
@@ -281,10 +281,14 @@ void GLSLComponent::createShaders()
 		uniforms = new Uniforms(openGLContext, *shader);
 
 		statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
+		isShaderCompileSuccess = true;
+
+		StaticValues::setShaderCacheVerified(newFragmentShader);
 	}
 	else
 	{
 		statusText = newShader->getLastError();
+		isShaderCompileSuccess = false;
 	}
 
 	if (statusLabel != nullptr)
@@ -322,10 +326,14 @@ void GLSLComponent::updateShader()
 			uniforms = new Uniforms(openGLContext, *shader);
 
 			statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
+			isShaderCompileSuccess = true;
+
+			StaticValues::setShaderCacheVerified(newFragmentShader);
 		}
 		else
 		{
 			statusText = newShader->getLastError();
+			isShaderCompileSuccess = false;
 		}
 
 		if (statusLabel != nullptr)

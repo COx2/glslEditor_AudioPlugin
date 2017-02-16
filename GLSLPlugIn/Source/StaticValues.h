@@ -19,6 +19,9 @@ public:
 	static const String getShaderCache();
 	static void setShaderCache(String str);
 
+	static const String getShaderCacheVerified();
+	static void setShaderCacheVerified(String str);
+
 	static bool getShaderCacheReady();
 	static void setShaderCacheReady(bool b);
 
