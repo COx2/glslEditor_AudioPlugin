@@ -145,7 +145,7 @@ void GLSLComponent::render()
 
 	if (uniforms->mouse != nullptr) {
 		if (isMouseButtonDown())
-			uniforms->mouse->set(mouseX * 0.1f, mouseY * 0.1f);
+			uniforms->mouse->set(mouseX, mouseY);
 	}
 
 	if (uniforms->midiCC != nullptr) {
@@ -338,8 +338,8 @@ void GLSLComponent::updateShader()
 
 void GLSLComponent::mouseDrag(const MouseEvent& event)
 {
-	mouseX = event.getPosition().getX();
-	mouseY = event.getPosition().getY();
+	mouseX = float(event.getPosition().getX()) / getWidth();
+	mouseY = 1.0f - float(event.getPosition().getY()) / getHeight();
 }
 
 Matrix3D<float> GLSLComponent::getProjectionMatrix() const
