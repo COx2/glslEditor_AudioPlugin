@@ -269,9 +269,9 @@ private:
     const char* vertexShader;
     const char* fragmentShader;
 
-	Label* statusLabel;
-	CodeDocument* fragmentDoc;
-	AudioProcessorEditor* editor;
+	Label* statusLabel = nullptr;
+	CodeDocument* fragmentDoc = nullptr;
+	AudioProcessorEditor* editor = nullptr;
 
     ScopedPointer<OpenGLShaderProgram> shader;
     ScopedPointer<Shape> shape;
