@@ -343,8 +343,8 @@ void GLSLComponent::mouseDrag(const MouseEvent& event)
 	mouseX = float(event.getPosition().getX()) / getWidth();
 	mouseY = 1.0f - float(event.getPosition().getY()) / getHeight();
 
-	std::min(std::max(0.0f, mouseX), 1.0f);
-	std::min(std::max(0.0f, mouseY), 1.0f);
+	mouseX = std::min(std::max(0.0f, mouseX), 1.0f);
+	mouseY = std::min(std::max(0.0f, mouseY), 1.0f);
 }
 
 Matrix3D<float> GLSLComponent::getProjectionMatrix() const
