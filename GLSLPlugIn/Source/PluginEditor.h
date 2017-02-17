@@ -82,11 +82,18 @@ private:
 	virtual void buttonClicked(Button*) override;
 	
 	bool isShaderSyncAuto = false;
-	bool isCodeEditorShow = true;
 	bool isNeedShaderCompile = false;
 	
 	int wndFullSizeW = 1024;
 	int wndFullSizeH = 576;
+	
+	enum GUIState {
+		Default,
+		PreviewOnly,
+		EditorOnly,
+	};
+	GUIState m_guiState = GUIState::Default;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessorEditor)
 };
