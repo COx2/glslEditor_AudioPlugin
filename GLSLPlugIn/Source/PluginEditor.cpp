@@ -106,34 +106,53 @@ void GlslplugInAudioProcessorEditor::resized()
 
 	int editorBottom = wndFullSizeH - 80;
 	int editorSide = wndFullSizeW - wndFullSizeH;
-	fragmentEditorComp.setBounds(glSide, 0, editorSide, editorBottom);
 
-	m_statusLabel.setBounds(glSide, editorBottom, editorSide, 60);
-
-	m_SyncModeSwitch.setBounds(glSide, editorBottom + 60, 108, 20);
-	
-	m_SyncButton.setBounds(glSide + 108, editorBottom + 60, 170, 20);
-
-	m_PlayWndButton.setBounds(glSide + 278, editorBottom + 60, 170, 20);
-
-
-	if (isCodeEditorShow)
+	switch (m_guiState)
 	{
+	case GUIState::Default:
+		fragmentEditorComp.setBounds(glSide, 0, editorSide, editorBottom);
+		m_statusLabel.setBounds(glSide, editorBottom, editorSide, 60);
+		m_SyncModeSwitch.setBounds(glSide, editorBottom + 60, 108, 20);
+		m_SyncButton.setBounds(glSide + 108, editorBottom + 60, 170, 20);
+		m_PlayWndButton.setBounds(glSide + 278, editorBottom + 60, 170, 20);
+		m_GLSLCompo.setVisible(true);
 		fragmentEditorComp.setVisible(true);
 		m_SyncModeSwitch.setVisible(true);
 		m_SyncButton.setVisible(true);
 		m_PlayWndButton.setVisible(true);
 		m_statusLabel.setVisible(true);
 		this->setSize(wndFullSizeW, wndFullSizeH);
-	}
-	else
-	{
+		break;
+
+	case GUIState::EditorOnly:
+		fragmentEditorComp.setBounds(0, 0, wndFullSizeW, editorBottom);
+		m_statusLabel.setBounds(0, editorBottom, wndFullSizeW, 60);
+		m_SyncModeSwitch.setBounds(glSide, editorBottom + 60, 108, 20);
+		m_SyncButton.setBounds(glSide + 108, editorBottom + 60, 170, 20);
+		m_PlayWndButton.setBounds(glSide + 278, editorBottom + 60, 170, 20);
+		m_GLSLCompo.setVisible(false);
+		fragmentEditorComp.setVisible(true);
+		m_SyncModeSwitch.setVisible(true);
+		m_SyncButton.setVisible(true);
+		m_PlayWndButton.setVisible(true);
+		m_statusLabel.setVisible(true);
+		this->setSize(wndFullSizeW, wndFullSizeH);
+		break;
+
+	case GUIState::PreviewOnly:
+		fragmentEditorComp.setBounds(glSide, 0, editorSide, editorBottom);
+		m_statusLabel.setBounds(glSide, editorBottom, editorSide, 60);
+		m_SyncModeSwitch.setBounds(glSide, editorBottom + 60, 108, 20);
+		m_SyncButton.setBounds(glSide + 108, editorBottom + 60, 170, 20);
+		m_PlayWndButton.setBounds(glSide + 278, editorBottom + 60, 170, 20);
+		m_GLSLCompo.setVisible(true);
 		fragmentEditorComp.setVisible(false);
 		m_SyncModeSwitch.setVisible(false);
 		m_SyncButton.setVisible(false);
 		m_PlayWndButton.setVisible(false);
 		m_statusLabel.setVisible(false);
 		this->setSize(glSide, glBottom);
+		break;
 	}
 }
 
@@ -268,7 +287,32 @@ bool GlslplugInAudioProcessorEditor::keyPressed(const KeyPress& key, Component* 
 	{
 		if (key.getKeyCode() == 75) // "k"
 		{
-			isCodeEditorShow = !isCodeEditorShow;
+			switch (m_guiState)
+			{
+			case GUIState::Default:
+				m_guiState = GUIState::PreviewOnly;
+				break;
+			case GUIState::EditorOnly:
+				break;
+			case GUIState::PreviewOnly:
+				m_guiState = GUIState::Default;
+				break;
+			}
+			this->resized();
+		}
+		if (key.getKeyCode() == 80) // "p"
+		{
+			switch (m_guiState)
+			{
+			case GUIState::Default:
+				m_guiState = GUIState::EditorOnly;
+				break;
+			case GUIState::EditorOnly:
+				m_guiState = GUIState::Default;
+				break;
+			case GUIState::PreviewOnly:
+				break;
+			}
 			this->resized();
 		}
 		if (key.getKeyCode() == 43 || key.getKeyCode() == 59) // "+ or ;"
