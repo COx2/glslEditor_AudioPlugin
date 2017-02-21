@@ -1,17 +1,31 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2015
-Project("{DFB64533-3F0B-3F28-CF3E-4C78A0794AD3}") = "GLSLPlugIn", "GLSLPlugIn.vcxproj", "{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLSLPlugIn", "GLSLPlugIn.vcxproj", "{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|Win32.Build.0 = Debug|Win32
 		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|x64.ActiveCfg = Debug|x64
 		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|x64.Build.0 = Debug|x64
+		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|x86.ActiveCfg = Debug|Win32
+		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|x86.Build.0 = Debug|Win32
+		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|Win32.ActiveCfg = Release|Win32
+		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|Win32.Build.0 = Release|Win32
 		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|x64.ActiveCfg = Release|x64
 		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|x64.Build.0 = Release|x64
+		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|x86.ActiveCfg = Release|Win32
+		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

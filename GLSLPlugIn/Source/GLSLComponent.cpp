@@ -228,14 +228,14 @@ void GLSLComponent::setMidiCCValue(int ccNumber, float value)
 {
 	if (ccNumber < 128) {
 		m_midiCC[ccNumber] = value;
-
-		if (statusLabel != nullptr) 
+#ifdef DEBUG
+		if (statusLabel != nullptr)
 		{
 			auto cText = statusLabel->getText();
 			cText += " /" + String(ccNumber) + "-" + String(value, 1);
 			statusLabel->setText(cText, dontSendNotification);
 		}
-
+#endif // DEBUG
 	}
 }
 
