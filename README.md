@@ -5,7 +5,7 @@ Project Name : GLSL Editor Audio Plugin
 
 Product Name : None
 
-Current Version : V0.1.0
+Current Version : v1.0.0
 
 License : GPL v3
 
