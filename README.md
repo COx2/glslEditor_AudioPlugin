@@ -1,3 +1,5 @@
+[![Github All Releases](https://img.shields.io/github/downloads/COx2/glslEditor_AudioPlugin/total.svg)]()  [![GitHub release](https://img.shields.io/github/release/COx2/glslEditor_AudioPlugin.svg)](https://github.com/COx2/glslEditor_AudioPlugin/releases)
+
 ## glslEditor_AudioPlugin ##
 GLSL for Audio Plugin
 
