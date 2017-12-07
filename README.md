@@ -3,7 +3,7 @@
 ## glslEditor_AudioPlugin ##
 GLSL for Audio Plugin
 
-Project Name : GLSL Editor Audio Plugin
+Project Name : GLSL Editor Audio Plugin (+stand-alone)
 
 Product Name : None
 
@@ -13,6 +13,8 @@ License : GPL v3
 
 [JUCE JAPAN / Outlaw Faction](http://oufac.com/ "Outlaw Faction")
 
+Require : JUCE v5.2.0
+
 ## What is this project? ##
 GLSL Editor running on VST/AU plugin host Applications Cubase, StudioOne, Ableton Live, Logic, and more...
 This Editor already defined uniform variables, and GLSL code compatible for "GLSL Sandbox".
@@ -20,6 +22,13 @@ http://glslsandbox.com/
 
 This demo movie has copy and paste the glsl codes from "GLSL Sandbox Gallery".
 ![Alt Text](VST_GLSL_0134.gif)
+
+## Support Format
+
++ VST
++ VST3
++ AudioUnit
++ Stand-alone executable
 
 ## Usage / uniform variables
 Some uniform variables are specific to the GLSL Sandbox and others are provided by this plugin.

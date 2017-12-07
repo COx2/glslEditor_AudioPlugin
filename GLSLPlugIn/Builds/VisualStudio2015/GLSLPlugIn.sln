@@ -1,31 +1,36 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLSLPlugIn", "GLSLPlugIn.vcxproj", "{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2015
+
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLSLPlugIn - Standalone Plugin", "GLSLPlugIn_StandalonePlugin.vcxproj", "{13EFE056-BD0C-2DDC-B34F-FF75F87BD559}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3DF7A433-1875-F38E-F741-4102889384EE} = {3DF7A433-1875-F38E-F741-4102889384EE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLSLPlugIn - VST", "GLSLPlugIn_VST.vcxproj", "{556A2753-05E1-AAB7-14DC-1E8D345211EC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3DF7A433-1875-F38E-F741-4102889384EE} = {3DF7A433-1875-F38E-F741-4102889384EE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLSLPlugIn - Shared Code", "GLSLPlugIn_SharedCode.vcxproj", "{3DF7A433-1875-F38E-F741-4102889384EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|Win32.Build.0 = Debug|Win32
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|x64.ActiveCfg = Debug|x64
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|x64.Build.0 = Debug|x64
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|x86.ActiveCfg = Debug|Win32
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Debug|x86.Build.0 = Debug|Win32
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|Win32.ActiveCfg = Release|Win32
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|Win32.Build.0 = Release|Win32
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|x64.ActiveCfg = Release|x64
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|x64.Build.0 = Release|x64
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|x86.ActiveCfg = Release|Win32
-		{A56B9DB1-0BA3-1C7E-115D-61766DB4394A}.Release|x86.Build.0 = Release|Win32
+		{556A2753-05E1-AAB7-14DC-1E8D345211EC}.Debug|x64.ActiveCfg = Debug|x64
+		{556A2753-05E1-AAB7-14DC-1E8D345211EC}.Debug|x64.Build.0 = Debug|x64
+		{556A2753-05E1-AAB7-14DC-1E8D345211EC}.Release|x64.ActiveCfg = Release|x64
+		{556A2753-05E1-AAB7-14DC-1E8D345211EC}.Release|x64.Build.0 = Release|x64
+		{13EFE056-BD0C-2DDC-B34F-FF75F87BD559}.Debug|x64.ActiveCfg = Debug|x64
+		{13EFE056-BD0C-2DDC-B34F-FF75F87BD559}.Debug|x64.Build.0 = Debug|x64
+		{13EFE056-BD0C-2DDC-B34F-FF75F87BD559}.Release|x64.ActiveCfg = Release|x64
+		{13EFE056-BD0C-2DDC-B34F-FF75F87BD559}.Release|x64.Build.0 = Release|x64
+		{3DF7A433-1875-F38E-F741-4102889384EE}.Debug|x64.ActiveCfg = Debug|x64
+		{3DF7A433-1875-F38E-F741-4102889384EE}.Debug|x64.Build.0 = Debug|x64
+		{3DF7A433-1875-F38E-F741-4102889384EE}.Release|x64.ActiveCfg = Release|x64
+		{3DF7A433-1875-F38E-F741-4102889384EE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

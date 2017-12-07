@@ -14,6 +14,7 @@ BEGIN
     BLOCK "040904E4"
     BEGIN
       VALUE "CompanyName",  "JUCE JAPAN\0"
+      VALUE "LegalCopyright",  "JUCE JAPAN\0"
       VALUE "FileDescription",  "GLSLPlugIn\0"
       VALUE "FileVersion",  "1.0.0\0"
       VALUE "ProductName",  "GLSLPlugIn\0"
