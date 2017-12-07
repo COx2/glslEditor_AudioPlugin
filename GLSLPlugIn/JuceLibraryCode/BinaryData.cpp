@@ -9,15 +9,15 @@ namespace BinaryData
 
 //================== base.obj ==================
 static const unsigned char temp_binary_data_0[] =
-"g board\r\n"
-"\r\n"
-"v -1.000000 -1.000000 0.000000\r\n"
-"v 1.000000 1.000000 0.000000\r\n"
-"v 1.000000 -1.000000 0.000000\r\n"
-"v -1.000000 1.000000 0.000000\r\n"
-"vn 0.000000 0.000000 -1.000000\r\n"
-"f 1//1 2//1 3//1\r\n"
-"f 1//1 4//1 2//1\r\n";
+"g board\n"
+"\n"
+"v -1.000000 -1.000000 0.000000\n"
+"v 1.000000 1.000000 0.000000\n"
+"v 1.000000 -1.000000 0.000000\n"
+"v -1.000000 1.000000 0.000000\n"
+"vn 0.000000 0.000000 -1.000000\n"
+"f 1//1 2//1 3//1\n"
+"f 1//1 4//1 2//1\n";
 
 const char* base_obj = (const char*) temp_binary_data_0;
 
@@ -32,7 +32,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes) throw
 
     switch (hash)
     {
-        case 0x99691289:  numBytes = 203; return base_obj;
+        case 0x99691289:  numBytes = 194; return base_obj;
         default: break;
     }
 

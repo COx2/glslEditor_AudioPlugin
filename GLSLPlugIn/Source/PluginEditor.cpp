@@ -16,7 +16,7 @@
 GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p),
 	fragmentEditorComp(fragmentDocument, nullptr),
-	forwardFFT(fftOrder, false),
+	forwardFFT(fftOrder),
 	fifoIndex(0),
 	nextFFTBlockReady(false)
 {

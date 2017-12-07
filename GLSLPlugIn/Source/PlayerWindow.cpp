@@ -12,7 +12,7 @@
 
 PlayerWindow::PlayerWindow(String name)
 	: DocumentWindow(name, Colours::lightgrey, DocumentWindow::allButtons),
-	forwardFFT(fftOrder, false),
+	forwardFFT(fftOrder),
 	fifoIndex(0),
 	nextFFTBlockReady(false)
 {

@@ -66,7 +66,7 @@ private:
 	void sendNextWave();
 
 	// FFT 
-	juce::FFT forwardFFT;
+	dsp::FFT forwardFFT;
 	float fifo[fftSize];
 	float fftData[2 * fftSize];
 	int fifoIndex;
