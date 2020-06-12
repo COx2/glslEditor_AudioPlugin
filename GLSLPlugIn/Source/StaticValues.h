@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef STATICVALUES_H_INCLUDED
-#define STATICVALUES_H_INCLUDED
+#pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
@@ -27,6 +26,6 @@ public:
 
 	static bool getNeedShaderSync();
 	static void setNeedShaderSync(bool b);
-};
 
-#endif  // STATICVALUES_H_INCLUDED
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StaticValues)
+};

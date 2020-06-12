@@ -11,7 +11,7 @@
 #include "StaticValues.h"
 
 //==============================================================================
-const char* GLSLComponent::defaultVertexShader =
+const String GLSLComponent::defaultVertexShader = String(
 "attribute vec3 position;\n"
 "attribute vec3 normal;\n"
 "attribute vec4 sourceColour;\n"
@@ -34,9 +34,10 @@ const char* GLSLComponent::defaultVertexShader =
 "    trnsmat = trnsmat*0.5;\n"
 "    surfacePosition = (vec4(position, 1.0) * trnsmat).xy;\n"
 "    gl_Position = vec4(position, 1.0);\n"
-"}\n";
+"}\n"
+);
 
-const char* GLSLComponent::defaultFragmentShader =
+const String GLSLComponent::defaultFragmentShader = String(
 #if JUCE_OPENGL_ES
 "varying lowp vec4 destinationColour;\n"
 "varying lowp vec2 textureCoordOut;\n"
@@ -63,7 +64,8 @@ const char* GLSLComponent::defaultFragmentShader =
 "    float g = abs(sin(position.x - position.y + time + mouse.x));\n"
 "    float b = abs(tan(position.y + time + mouse.y * wave[64]));\n"
 "    gl_FragColor = vec4(r, g, b, 1.0);\n"
-"}\n";
+"}\n"
+);
 
 //==============================================================================
 GLSLComponent::GLSLComponent()
@@ -273,10 +275,6 @@ void GLSLComponent::createShaders()
 		&& newShader->addFragmentShader(OpenGLHelpers::translateFragmentShaderToV3(fragmentShader))
 		&& newShader->link())
 	{
-		shape = nullptr;
-		attributes = nullptr;
-		uniforms = nullptr;
-
 		shader = std::move(newShader);
 		shader->use();
 
@@ -317,10 +315,6 @@ void GLSLComponent::updateShader()
 			&& newShader->addFragmentShader(OpenGLHelpers::translateFragmentShaderToV3(newFragmentShader))
 			&& newShader->link())
 		{
-			shape = nullptr;
-			attributes = nullptr;
-			uniforms = nullptr;
-
 			shader = std::move(newShader);
 			shader->use();
 

@@ -23,8 +23,9 @@
   ==============================================================================
 */
 
-#include <map>
+#pragma once
 
+#include <map>
 
 //==============================================================================
 /**
@@ -61,6 +62,8 @@ public:
         Array<Vertex> vertices, normals;
         Array<TextureCoord> textureCoords;
         Array<Index> indices;
+
+        JUCE_LEAK_DETECTOR(Mesh)
     };
 
     struct Material
@@ -83,6 +86,8 @@ public:
                specularTextureName, normalTextureName;
 
         StringPairArray parameters;
+
+        JUCE_LEAK_DETECTOR(Material)
     };
 
     struct Shape
@@ -90,6 +95,8 @@ public:
         String name;
         Mesh mesh;
         Material material;
+
+        JUCE_LEAK_DETECTOR(Shape)
     };
 
     OwnedArray<Shape> shapes;
@@ -117,6 +124,8 @@ private:
         }
 
         int vertexIndex, textureIndex, normalIndex;
+
+        JUCE_LEAK_DETECTOR(TripleIndex)
     };
 
     struct IndexMap
@@ -144,6 +153,8 @@ private:
             map[i] = index;
             return index;
         }
+
+        JUCE_LEAK_DETECTOR(IndexMap)
     };
 
     static float parseFloat (String::CharPointerType& t)
@@ -245,6 +256,8 @@ private:
         {
             return CharacterFunctions::findEndOfToken (t, CharPointer_ASCII ("/ \t"), String().getCharPointer());
         }
+
+        JUCE_LEAK_DETECTOR(Face)
     };
 
     static Shape* parseFaceGroup (const Mesh& srcMesh,

@@ -8,14 +8,10 @@
   ==============================================================================
 */
 
-#ifndef PLUGINPROCESSOR_H_INCLUDED
-#define PLUGINPROCESSOR_H_INCLUDED
+#pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "StaticValues.h"
-
 #include "PlayerWindow.h"
-#include <queue>
 
 //==============================================================================
 /**
@@ -70,5 +66,3 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessor)
 };
-
-#endif  // PLUGINPROCESSOR_H_INCLUDED

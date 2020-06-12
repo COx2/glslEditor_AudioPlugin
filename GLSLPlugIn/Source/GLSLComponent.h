@@ -52,8 +52,8 @@ public:
 	bool isInitialised = false;
 	bool isShaderCompileSuccess = false;
 
-    static const char* defaultVertexShader;
-    static const char* defaultFragmentShader;
+    static const String defaultVertexShader;
+    static const String defaultFragmentShader;
 
 private:
     //==============================================================================
@@ -74,6 +74,8 @@ private:
         float normal[3];
         float colour[4];
         float texCoord[2];
+
+        JUCE_LEAK_DETECTOR(Vertex)
     };
     
 	//==============================================================================
@@ -135,6 +137,8 @@ private:
 
             return new OpenGLShaderProgram::Attribute (shader, attributeName);
         }
+
+        JUCE_LEAK_DETECTOR(Attributes)
     };
 
     //==============================================================================
@@ -143,18 +147,28 @@ private:
     {
         Uniforms (OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
         {
-            projectionMatrix = createUniform (openGLContext, shaderProgram, "projectionMatrix");
-            viewMatrix       = createUniform (openGLContext, shaderProgram, "viewMatrix");
-			time = createUniform(openGLContext, shaderProgram, "time");
-			resolution = createUniform(openGLContext, shaderProgram, "resolution");
-			mouse = createUniform(openGLContext, shaderProgram, "mouse");
-			midiCC = createUniform(openGLContext, shaderProgram, "midiCC");
-			spectrum = createUniform(openGLContext, shaderProgram, "spectrum");
-			wave = createUniform(openGLContext, shaderProgram, "wave");
+            projectionMatrix.reset(createUniform (openGLContext, shaderProgram, "projectionMatrix"));
+            viewMatrix.reset(createUniform (openGLContext, shaderProgram, "viewMatrix"));
+			time.reset(createUniform(openGLContext, shaderProgram, "time"));
+			resolution.reset(createUniform(openGLContext, shaderProgram, "resolution"));
+			mouse.reset(createUniform(openGLContext, shaderProgram, "mouse"));
+			midiCC.reset(createUniform(openGLContext, shaderProgram, "midiCC"));
+			spectrum.reset(createUniform(openGLContext, shaderProgram, "spectrum"));
+			wave.reset(createUniform(openGLContext, shaderProgram, "wave"));
         }
 
-		OpenGLShaderProgram::Uniform
-			*projectionMatrix, *viewMatrix, *time, *resolution, *mouse, *midiCC, *wave, *waveL, *waveR, *spectrum, *spectrumL, *spectrumR;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> projectionMatrix;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> viewMatrix;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> time;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> resolution;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> mouse;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> midiCC;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> wave;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> waveL;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> waveR;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> spectrum;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> spectrumL;
+        std::unique_ptr<OpenGLShaderProgram::Uniform> spectrumR;
 
     private:
         static OpenGLShaderProgram::Uniform* createUniform (OpenGLContext& openGLContext,
@@ -166,6 +180,8 @@ private:
 
             return new OpenGLShaderProgram::Uniform (shaderProgram, uniformName);
         }
+
+        JUCE_LEAK_DETECTOR(Uniforms)
     };
 
     //==============================================================================
@@ -267,10 +283,12 @@ private:
                 list.add (vert);
             }
         }
+
+        JUCE_LEAK_DETECTOR(Shape)
     };
 
-    const char* vertexShader;
-    const char* fragmentShader;
+    String vertexShader;
+    String fragmentShader;
 
     String statusText{};
 	Label* statusLabel = nullptr;

@@ -9,6 +9,7 @@
 */
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "StaticValues.h"
 
 //==============================================================================
 GlslplugInAudioProcessor::GlslplugInAudioProcessor()
