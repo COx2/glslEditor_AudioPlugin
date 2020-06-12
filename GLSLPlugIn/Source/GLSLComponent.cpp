@@ -11,7 +11,7 @@
 #include "StaticValues.h"
 
 //==============================================================================
-static const char* defaultVertexShader =
+const char* GLSLComponent::defaultVertexShader =
 "attribute vec3 position;\n"
 "attribute vec3 normal;\n"
 "attribute vec4 sourceColour;\n"
@@ -36,7 +36,7 @@ static const char* defaultVertexShader =
 "    gl_Position = vec4(position, 1.0);\n"
 "}\n";
 
-static const char* defaultFragmentShader =
+const char* GLSLComponent::defaultFragmentShader =
 #if JUCE_OPENGL_ES
 "varying lowp vec4 destinationColour;\n"
 "varying lowp vec2 textureCoordOut;\n"
@@ -68,7 +68,6 @@ static const char* defaultFragmentShader =
 //==============================================================================
 GLSLComponent::GLSLComponent()
 {
-	//setSize(800, 600);
 }
 
 GLSLComponent::~GLSLComponent()
@@ -88,12 +87,11 @@ void GLSLComponent::initialise()
 	}
 	else
 	{
-		if (fragmentDoc != nullptr)
-			fragmentDoc->replaceAllContent(defaultFragmentShader);
-
 		createShaders();
 	}
 	isInitialised = true;
+
+	triggerAsyncUpdate();
 }
 
 void GLSLComponent::shutdown()
@@ -113,6 +111,9 @@ void GLSLComponent::render()
 		return;
 
 	jassert(OpenGLHelpers::isContextActive());
+
+	if (shader == nullptr)
+		return;
 
 	if (isShaderCompileReady)
 		updateShader();
@@ -198,11 +199,7 @@ void GLSLComponent::setFragmentDocPtr(CodeDocument* _fragmentDoc)
 	fragmentDoc = _fragmentDoc;
 }
 
-void GLSLComponent::setEditorPtr(AudioProcessorEditor* _editor)
-{
-	editor = _editor;
-}
-
+//==============================================================================
 void GLSLComponent::setShaderProgram(const String& vertexShader, const String& fragmentShader)
 {
 	newVertexShader = vertexShader;
@@ -224,6 +221,7 @@ void GLSLComponent::setShaderProgramVertex(const String& _vertexShader)
 	isShaderCompileReady = true;
 }
 
+//==============================================================================
 void GLSLComponent::setMidiCCValue(int ccNumber, float value)
 {
 	if (ccNumber < 128) {
@@ -254,6 +252,13 @@ void GLSLComponent::setWaveValue(int waveNumber, float value)
 }
 
 //==============================================================================
+void GLSLComponent::handleAsyncUpdate()
+{
+	if (statusLabel != nullptr)
+		statusLabel->setText(statusText, dontSendNotification);
+}
+
+//==============================================================================
 void GLSLComponent::createShaders()
 {
 	if (!openGLContext.isAttached())
@@ -262,8 +267,7 @@ void GLSLComponent::createShaders()
 	if (!openGLContext.isActive())
 		return;
 
-	ScopedPointer<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
-	String statusText;
+	std::unique_ptr<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
 
 	if (newShader->addVertexShader(OpenGLHelpers::translateVertexShaderToV3(vertexShader))
 		&& newShader->addFragmentShader(OpenGLHelpers::translateFragmentShaderToV3(fragmentShader))
@@ -273,12 +277,12 @@ void GLSLComponent::createShaders()
 		attributes = nullptr;
 		uniforms = nullptr;
 
-		shader = newShader;
+		shader = std::move(newShader);
 		shader->use();
 
-		shape = new Shape(openGLContext);
-		attributes = new Attributes(openGLContext, *shader);
-		uniforms = new Uniforms(openGLContext, *shader);
+		shape.reset(new Shape(openGLContext));
+		attributes.reset(new Attributes(openGLContext, *shader));
+		uniforms.reset(new Uniforms(openGLContext, *shader));
 
 		statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
 		isShaderCompileSuccess = true;
@@ -291,10 +295,9 @@ void GLSLComponent::createShaders()
 		isShaderCompileSuccess = false;
 	}
 
-	if (statusLabel != nullptr)
-		statusLabel->setText(statusText, dontSendNotification);
-
 	isShaderCompileReady = false;
+
+	triggerAsyncUpdate();
 }
 
 void GLSLComponent::updateShader()
@@ -307,7 +310,7 @@ void GLSLComponent::updateShader()
 
 	if (newVertexShader.isNotEmpty() || newFragmentShader.isNotEmpty())
 	{
-		ScopedPointer<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
+		std::unique_ptr<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
 		String statusText;
 
 		if (newShader->addVertexShader(OpenGLHelpers::translateVertexShaderToV3(newVertexShader))
@@ -318,12 +321,12 @@ void GLSLComponent::updateShader()
 			attributes = nullptr;
 			uniforms = nullptr;
 
-			shader = newShader;
+			shader = std::move(newShader);
 			shader->use();
 
-			shape = new Shape(openGLContext);
-			attributes = new Attributes(openGLContext, *shader);
-			uniforms = new Uniforms(openGLContext, *shader);
+			shape.reset(new Shape(openGLContext));
+			attributes.reset(new Attributes(openGLContext, *shader));
+			uniforms.reset(new Uniforms(openGLContext, *shader));
 
 			statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
 			isShaderCompileSuccess = true;
@@ -336,14 +339,13 @@ void GLSLComponent::updateShader()
 			isShaderCompileSuccess = false;
 		}
 
-		if (statusLabel != nullptr)
-			statusLabel->setText(statusText, dontSendNotification);
-
 		newVertexShader = String();
 		newFragmentShader = String();
 
 		isShaderCompileReady = false;
 	}
+
+	triggerAsyncUpdate();
 }
 
 void GLSLComponent::mouseDrag(const MouseEvent& event)
@@ -365,7 +367,7 @@ Matrix3D<float> GLSLComponent::getProjectionMatrix() const
 Matrix3D<float> GLSLComponent::getViewMatrix() const
 {
 	Matrix3D<float> viewMatrix(Vector3D<float>(0.0f, 0.0f, -5.0f /*-10.0f*/));
-	Matrix3D<float> rotationMatrix = viewMatrix.rotated(Vector3D<float>(-0.3f, 5.0f * std::sin(getFrameCounter() * 0.01f), 0.0f));
+	Matrix3D<float> rotationMatrix = viewMatrix.rotation(Vector3D<float>(-0.3f, 5.0f * std::sin(getFrameCounter() * 0.01f), 0.0f));
 
 	return /*rotationMatrix * */viewMatrix;
 }

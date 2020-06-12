@@ -27,7 +27,6 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 
 	m_GLSLCompo.setStatusLabelPtr(&m_statusLabel);
 	m_GLSLCompo.setFragmentDocPtr(&fragmentDocument);
-	m_GLSLCompo.setEditorPtr(this);
 	addAndMakeVisible(m_GLSLCompo);
 
 	Colour editorBackground(Colours::darkgrey);
@@ -47,7 +46,6 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	m_statusLabel.setFont(Font(14.0f));
 	addAndMakeVisible(m_statusLabel);
 
-	m_SyncModeSwitch.setLookAndFeel(new LookAndFeel_V3());
 	m_SyncModeSwitch.setToggleState(false, dontSendNotification);
 	m_SyncModeSwitch.setColour(Label::backgroundColourId, windowBackground);
 	m_SyncModeSwitch.setColour(Label::textColourId, windowForeground);
@@ -56,7 +54,6 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	m_SyncModeSwitch.addListener(this);
 	addAndMakeVisible(m_SyncModeSwitch);
 
-	m_SyncButton.setLookAndFeel(new LookAndFeel_V3());
 	m_SyncButton.setColour(Label::backgroundColourId, Colours::darkmagenta);
 	m_SyncButton.setColour(Label::textColourId, Colours::white);
 	m_SyncButton.setButtonText("Sync Player");
@@ -64,7 +61,6 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	m_SyncButton.addListener(this);
 	addAndMakeVisible(m_SyncButton);
 
-	m_PlayWndButton.setLookAndFeel(new LookAndFeel_V3());
 	m_PlayWndButton.setColour(Label::backgroundColourId, Colours::darkmagenta);
 	m_PlayWndButton.setColour(Label::textColourId, Colours::white);
 	m_PlayWndButton.setButtonText("Player Window");
@@ -72,14 +68,9 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 	m_PlayWndButton.addListener(this);
 	addAndMakeVisible(m_PlayWndButton);
 
-	if (StaticValues::getShaderCacheReady())
-	{
-		fragmentDocument.replaceAllContent(StaticValues::getShaderCache());
-	}
-	else
-	{
-		startTimer(shaderLinkDelay);
-	}
+	fragmentDocument.replaceAllContent(GLSLComponent::defaultFragmentShader);
+
+	startTimer(shaderLinkDelay);
 }
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()

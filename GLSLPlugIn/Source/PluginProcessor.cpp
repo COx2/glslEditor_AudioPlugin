@@ -25,7 +25,6 @@ GlslplugInAudioProcessor::GlslplugInAudioProcessor()
 {
 	StaticValues::setShaderCache("");
 	StaticValues::setShaderCacheReady(false);
-
 }
 
 GlslplugInAudioProcessor::~GlslplugInAudioProcessor()
@@ -233,7 +232,7 @@ void GlslplugInAudioProcessor::setStateInformation (const void* data, int sizeIn
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 
-	XmlElement* pRoot = getXmlFromBinary(data, sizeInBytes);
+	auto pRoot = getXmlFromBinary(data, sizeInBytes);
 	if (pRoot != nullptr)
 	{
 		juce::XmlElement* pChild;
@@ -245,7 +244,6 @@ void GlslplugInAudioProcessor::setStateInformation (const void* data, int sizeIn
 				StaticValues::setShaderCache(text);
 			}
 		}
-		delete pRoot;
 	}
 }
 

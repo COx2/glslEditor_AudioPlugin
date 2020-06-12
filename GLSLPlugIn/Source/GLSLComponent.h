@@ -7,56 +7,58 @@
 
   ==============================================================================
 */
-#ifndef MAINCOMPONENT_H_INCLUDED
-#define MAINCOMPONENT_H_INCLUDED
+
+#pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Resources/WavefrontObjParser.h"
 
-#include <math.h>
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class GLSLComponent   : public OpenGLAppComponent
+class GLSLComponent   : public OpenGLAppComponent,
+                        public AsyncUpdater
 {
 public:
     //==============================================================================
 	GLSLComponent();
 	~GLSLComponent();
 
+    //==============================================================================
 	void initialise() override;
 	void shutdown() override;
-    
 	void render() override;
 
+    //==============================================================================
 	void paint(Graphics& g) override;
-
 	void resized() override;
 
+    //==============================================================================
 	void setStatusLabelPtr(Label* _statusLabel);
-
 	void setFragmentDocPtr(CodeDocument* _fragmentDoc);
 
-	void setEditorPtr(AudioProcessorEditor* _editor);
-
+    //==============================================================================
 	void setShaderProgram(const String& vertexShader, const String& fragmentShader);
-
 	void setShaderProgramFragment(const String& _fragmentShader);
-
 	void setShaderProgramVertex(const String& _vertexShader);
 
+    //==============================================================================
 	void setMidiCCValue(int ccNumber, float value);
-
 	void setSpectrumValue(int spectrumNumber, float value);
-
 	void setWaveValue(int waveNumber, float value);
 
 	bool isInitialised = false;
 	bool isShaderCompileSuccess = false;
 
+    static const char* defaultVertexShader;
+    static const char* defaultFragmentShader;
+
 private:
+    //==============================================================================
+    virtual void handleAsyncUpdate() override;
+
 	//==============================================================================
 	void createShaders();
 	void updateShader();
@@ -270,14 +272,14 @@ private:
     const char* vertexShader;
     const char* fragmentShader;
 
+    String statusText{};
 	Label* statusLabel = nullptr;
 	CodeDocument* fragmentDoc = nullptr;
-	AudioProcessorEditor* editor = nullptr;
 
-    ScopedPointer<OpenGLShaderProgram> shader;
-    ScopedPointer<Shape> shape;
-    ScopedPointer<Attributes> attributes;
-    ScopedPointer<Uniforms> uniforms;
+    std::unique_ptr<OpenGLShaderProgram> shader;
+    std::unique_ptr<Shape> shape;
+    std::unique_ptr<Attributes> attributes;
+    std::unique_ptr<Uniforms> uniforms;
 
 	GLfloat timeCounter = 0.0f;
 
@@ -290,9 +292,3 @@ private:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GLSLComponent)
 };
-
-
-// (This function is called by the app startup code to create our main component)
-//Component* createMainContentComponent()    { return new GLSLComponent(); }
-
-#endif  // MAINCOMPONENT_H_INCLUDED

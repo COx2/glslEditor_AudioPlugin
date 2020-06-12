@@ -262,7 +262,7 @@ private:
         IndexMap indexMap;
 
         for (int i = 0; i < faceGroup.size(); ++i)
-            faceGroup.getReference(i).addIndices (shape->mesh, srcMesh, indexMap);
+            faceGroup.getUnchecked(i).addIndices (shape->mesh, srcMesh, indexMap);
 
         return shape.release();
     }

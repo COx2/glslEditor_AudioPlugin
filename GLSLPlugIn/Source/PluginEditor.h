@@ -21,7 +21,7 @@
 class GlslplugInAudioProcessorEditor  : public AudioProcessorEditor,
 										public CodeDocument::Listener,
 										public KeyListener,
-										public ButtonListener,										
+	                                    public Button::Listener,										
 										private Timer
 {
 public:
