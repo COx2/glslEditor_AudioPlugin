@@ -11,61 +11,61 @@
 #include "StaticValues.h"
 
 //==============================================================================
-const String GLSLComponent::defaultVertexShader = String(
-"attribute vec3 position;\n"
-"attribute vec3 normal;\n"
-"attribute vec4 sourceColour;\n"
-"attribute vec2 texureCoordIn;\n"
-"attribute vec2 surfacePosAttrib;\n"
-"\n"
-"uniform mat4 projectionMatrix;\n"
-"uniform mat4 viewMatrix;\n"
-"uniform vec2 resolution;\n"
-"\n"
-"varying vec4 destinationColour;\n"
-"varying vec2 textureCoordOut;\n"
-"varying vec2 surfacePosition;\n"
-"\n"
-"void main()\n"
-"{\n"
-"    destinationColour = sourceColour;\n"
-"    textureCoordOut = texureCoordIn;\n"
-"    mat4 trnsmat = mat4(1., 0., 0., 0., 0., resolution.y / resolution.x, 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.);\n"
-"    trnsmat = trnsmat*0.5;\n"
-"    surfacePosition = (vec4(position, 1.0) * trnsmat).xy;\n"
-"    gl_Position = vec4(position, 1.0);\n"
-"}\n"
-);
+const String GLSLComponent::defaultVertexShader = String(std::string(R"(
+attribute vec3 position;
+attribute vec3 normal;
+attribute vec4 sourceColour;
+attribute vec2 texureCoordIn;
+attribute vec2 surfacePosAttrib;
 
-const String GLSLComponent::defaultFragmentShader = String(
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform vec2 resolution;
+
+varying vec4 destinationColour;
+varying vec2 textureCoordOut;
+varying vec2 surfacePosition;
+
+void main()
+{
+    destinationColour = sourceColour;
+    textureCoordOut = texureCoordIn;
+    mat4 trnsmat = mat4(1., 0., 0., 0., 0., resolution.y / resolution.x, 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.);
+    trnsmat = trnsmat*0.5;
+    surfacePosition = (vec4(position, 1.0) * trnsmat).xy;
+    gl_Position = vec4(position, 1.0);
+})"
+));
+
+const String GLSLComponent::defaultFragmentShader = String(std::string(R"(
 #if JUCE_OPENGL_ES
-"varying lowp vec4 destinationColour;\n"
-"varying lowp vec2 textureCoordOut;\n"
+varying lowp vec4 destinationColour;
+varying lowp vec2 textureCoordOut;
 #else
-"varying vec4 destinationColour;\n"
-"varying vec2 textureCoordOut;\n"
+varying vec4 destinationColour;
+varying vec2 textureCoordOut;
 #endif
-"\n"
-"#extension GL_OES_standard_derivatives : enable\n"
-"\n"
-"uniform float time;\n"  /**/
-"uniform vec2 mouse;\n" /**/
-"uniform vec2 resolution;\n" /**/
-"uniform float midiCC[128];\n"  /**/
-"uniform float wave[256];\n" /**/
-"uniform float spectrum[256];\n" /**/
-"\n"
-"#define pi 3.1415\n"
-"\n"
-"void main()\n"
-"{\n"
-"    vec2 position = (gl_FragCoord.xy / resolution.xy);\n"
-"    float r = abs(cos(position.x + time*position.y * spectrum[64]));\n"
-"    float g = abs(sin(position.x - position.y + time + mouse.x));\n"
-"    float b = abs(tan(position.y + time + mouse.y * wave[64]));\n"
-"    gl_FragColor = vec4(r, g, b, 1.0);\n"
-"}\n"
-);
+
+#extension GL_OES_standard_derivatives : enable
+
+uniform float time;
+uniform vec2 mouse;
+uniform vec2 resolution;
+uniform float midiCC[128];
+uniform float wave[256];
+uniform float spectrum[256];
+
+#define pi 3.1415
+
+void main()
+{
+    vec2 position = (gl_FragCoord.xy / resolution.xy);
+    float r = abs(cos(position.x + time*position.y * spectrum[64]));
+    float g = abs(sin(position.x - position.y + time + mouse.x));
+    float b = abs(tan(position.y + time + mouse.y * wave[64]));
+    gl_FragColor = vec4(r, g, b, 1.0);
+})"
+));
 
 //==============================================================================
 GLSLComponent::GLSLComponent()
