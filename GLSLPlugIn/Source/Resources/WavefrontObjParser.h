@@ -1,4 +1,4 @@
-/*
+﻿/*
   ==============================================================================
 
    This file is part of the JUCE library - "Jules' Utility Class Extensions"

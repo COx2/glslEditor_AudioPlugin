@@ -1,4 +1,4 @@
-/*
+﻿/*
   ==============================================================================
 
     GLSLComponent.cpp
@@ -309,7 +309,6 @@ void GLSLComponent::updateShader()
 	if (newVertexShader.isNotEmpty() || newFragmentShader.isNotEmpty())
 	{
 		std::unique_ptr<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
-		String statusText;
 
 		if (newShader->addVertexShader(OpenGLHelpers::translateVertexShaderToV3(newVertexShader))
 			&& newShader->addFragmentShader(OpenGLHelpers::translateFragmentShaderToV3(newFragmentShader))
