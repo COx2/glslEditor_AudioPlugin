@@ -8,10 +8,11 @@
               pluginCode="X25u" pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="1"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="1"
               pluginAUExportPrefix="GLSLPlugInAU" pluginRTASCategory="" aaxIdentifier="com.yourcompany.GLSLPlugIn"
-              pluginAAXCategory="2" jucerVersion="5.4.7" companyName="JUCE JAPAN"
-              displaySplashScreen="0" reportAppUsage="0" splashScreenColour="Dark"
-              buildStandalone="1" enableIAA="0" cppLanguageStandard="14" companyCopyright="JUCE JAPAN"
-              pluginFormats="buildStandalone,buildVST3" pluginCharacteristicsValue="pluginWantsMidiIn,pluginEditorRequiresKeys">
+              pluginAAXCategory="2" companyName="JUCE JAPAN" displaySplashScreen="0"
+              reportAppUsage="0" splashScreenColour="Dark" buildStandalone="1"
+              enableIAA="0" cppLanguageStandard="14" companyCopyright="JUCE JAPAN"
+              pluginFormats="buildStandalone,buildVST3" pluginCharacteristicsValue="pluginWantsMidiIn,pluginEditorRequiresKeys"
+              jucerFormatVersion="1">
   <MAINGROUP id="WmusS6" name="GLSLPlugIn">
     <GROUP id="{62F07D67-6522-5A3F-73EE-B626DF753D2B}" name="Source">
       <GROUP id="{13078132-C348-9757-A5BA-6A2A889F0CDE}" name="Resources">
