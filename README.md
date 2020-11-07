@@ -7,13 +7,13 @@ Project Name : GLSL Editor Audio Plugin (+stand-alone)
 
 Product Name : None
 
-Current Version : v1.0.0
+Current Version : v1.2.0
 
-License : GPL v3
+License : MIT
 
 [JUCE JAPAN / Outlaw Faction](http://oufac.com/ "Outlaw Faction")
 
-Require : JUCE v5.2.0
+Require : JUCE v6.0.0
 
 ## What is this project? ##
 GLSL Editor running on VST/AU plugin host Applications Cubase, StudioOne, Ableton Live, Logic, and more...
