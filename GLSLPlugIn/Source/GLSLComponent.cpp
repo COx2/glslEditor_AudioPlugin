@@ -11,7 +11,7 @@
 #include "StaticValues.h"
 
 //==============================================================================
-const String GLSLComponent::defaultVertexShader = String(std::string(R"(
+const String GLSLComponent::defaultVertexShader = String (std::string (R"(
 attribute vec3 position;
 attribute vec3 normal;
 attribute vec4 sourceColour;
@@ -34,10 +34,9 @@ void main()
     trnsmat = trnsmat*0.5;
     surfacePosition = (vec4(position, 1.0) * trnsmat).xy;
     gl_Position = vec4(position, 1.0);
-})"
-));
+})"));
 
-const String GLSLComponent::defaultFragmentShader = String(std::string(R"(
+const String GLSLComponent::defaultFragmentShader = String (std::string (R"(
 #if JUCE_OPENGL_ES
 varying lowp vec4 destinationColour;
 varying lowp vec2 textureCoordOut;
@@ -64,8 +63,7 @@ void main()
     float g = abs(sin(position.x - position.y + time + mouse.x));
     float b = abs(tan(position.y + time + mouse.y * wave[64]));
     gl_FragColor = vec4(r, g, b, 1.0);
-})"
-));
+})"));
 
 //==============================================================================
 GLSLComponent::GLSLComponent()
@@ -74,293 +72,302 @@ GLSLComponent::GLSLComponent()
 
 GLSLComponent::~GLSLComponent()
 {
-	shutdownOpenGL();
+    shutdownOpenGL();
 }
 
 void GLSLComponent::initialise()
 {
-	vertexShader = defaultVertexShader;
-	fragmentShader = defaultFragmentShader;
+    vertexShader = defaultVertexShader;
+    fragmentShader = defaultFragmentShader;
 
-	if (StaticValues::getShaderCacheReady())
-	{
-		setShaderProgramFragment(StaticValues::getShaderCacheVerified());
-		updateShader();
-	}
-	else
-	{
-		createShaders();
-	}
-	isInitialised = true;
+    if (StaticValues::getShaderCacheReady())
+    {
+        setShaderProgramFragment (StaticValues::getShaderCacheVerified());
+        updateShader();
+    }
+    else
+    {
+        createShaders();
+    }
+    isInitialised = true;
 
-	triggerAsyncUpdate();
+    triggerAsyncUpdate();
 }
 
 void GLSLComponent::shutdown()
 {
-	shader = nullptr;
-	shape = nullptr;
-	attributes = nullptr;
-	uniforms = nullptr;
+    shader = nullptr;
+    shape = nullptr;
+    attributes = nullptr;
+    uniforms = nullptr;
 }
 
 void GLSLComponent::render()
 {
-	if (!openGLContext.isAttached())
-		return;
+    if (! openGLContext.isAttached())
+        return;
 
-	if (!openGLContext.isActive())
-		return;
+    if (! openGLContext.isActive())
+        return;
 
-	jassert(OpenGLHelpers::isContextActive());
+    jassert (OpenGLHelpers::isContextActive());
 
-	if (shader == nullptr)
-		return;
+    if (shader == nullptr)
+        return;
 
-	if (isShaderCompileReady)
-		updateShader();
+    if (isShaderCompileReady)
+        updateShader();
 
-	const float desktopScale = (float)openGLContext.getRenderingScale();
-	OpenGLHelpers::clear(Colour::greyLevel(0.1f));
+    const float desktopScale = (float) openGLContext.getRenderingScale();
+    OpenGLHelpers::clear (Colour::greyLevel (0.1f));
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glViewport(0, 0, roundToInt(desktopScale * getWidth()), roundToInt(desktopScale * getHeight()));
+    glViewport (0, 0, roundToInt (desktopScale * getWidth()), roundToInt (desktopScale * getHeight()));
 
-	shader->use();
+    shader->use();
 
-	//////////////////////  VertextShader   ////////////////
+    //////////////////////  VertextShader   ////////////////
 
-	if (uniforms->projectionMatrix != nullptr)
-		uniforms->projectionMatrix->setMatrix4(getProjectionMatrix().mat, 1, false);
+    if (uniforms->projectionMatrix != nullptr)
+        uniforms->projectionMatrix->setMatrix4 (getProjectionMatrix().mat, 1, false);
 
-	if (uniforms->viewMatrix != nullptr)
-		uniforms->viewMatrix->setMatrix4(getViewMatrix().mat, 1, false);
+    if (uniforms->viewMatrix != nullptr)
+        uniforms->viewMatrix->setMatrix4 (getViewMatrix().mat, 1, false);
 
-	//////////////////////  FragmentShader   ////////////////
+    //////////////////////  FragmentShader   ////////////////
 
-	if (uniforms->time != nullptr) {
-		uniforms->time->set(timeCounter);
-	}
+    if (uniforms->time != nullptr)
+    {
+        uniforms->time->set (timeCounter);
+    }
 
-	if (uniforms->resolution != nullptr) {
-		uniforms->resolution->set(getWidth(), getHeight());
-	}
+    if (uniforms->resolution != nullptr)
+    {
+        uniforms->resolution->set (getWidth(), getHeight());
+    }
 
-	if (uniforms->mouse != nullptr) {
-		if (isMouseButtonDown())
-			uniforms->mouse->set(mouseX, mouseY);
-	}
+    if (uniforms->mouse != nullptr)
+    {
+        if (isMouseButtonDown())
+            uniforms->mouse->set (mouseX, mouseY);
+    }
 
-	if (uniforms->midiCC != nullptr) {
-		uniforms->midiCC->set(m_midiCC, 128);
-	}
+    if (uniforms->midiCC != nullptr)
+    {
+        uniforms->midiCC->set (m_midiCC, 128);
+    }
 
-	if (uniforms->spectrum != nullptr) {
-		uniforms->spectrum->set(m_spectrum, 256);
-	}
+    if (uniforms->spectrum != nullptr)
+    {
+        uniforms->spectrum->set (m_spectrum, 256);
+    }
 
-	if (uniforms->wave != nullptr) {
-		uniforms->wave->set(m_wave, 256);
-	}
+    if (uniforms->wave != nullptr)
+    {
+        uniforms->wave->set (m_wave, 256);
+    }
 
-	//////////////////////////////////////
+    //////////////////////////////////////
 
-	shape->draw(openGLContext, *attributes);
+    shape->draw (openGLContext, *attributes);
 
-	// Reset the element buffers so child Components draw correctly
-	openGLContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, 0);
-	openGLContext.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    // Reset the element buffers so child Components draw correctly
+    openGLContext.extensions.glBindBuffer (GL_ARRAY_BUFFER, 0);
+    openGLContext.extensions.glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	/**/
-	timeCounter += 0.02f;
-	/**/
+    /**/
+    timeCounter += 0.02f;
+    /**/
 }
 
-void GLSLComponent::paint(Graphics& g)
+void GLSLComponent::paint (Graphics& g)
 {
-	// You can add your component specific drawing code here!
-	// This will draw over the top of the openGL background.
+    // You can add your component specific drawing code here!
+    // This will draw over the top of the openGL background.
 }
 
 void GLSLComponent::resized()
 {
-	// This is called when the MainContentComponent is resized.
-	// If you add any child components, this is where you should
-	// update their positions.
+    // This is called when the MainContentComponent is resized.
+    // If you add any child components, this is where you should
+    // update their positions.
 }
 
-void GLSLComponent::setStatusLabelPtr(Label* _statusLabel)
+void GLSLComponent::setStatusLabelPtr (Label* _statusLabel)
 {
-	statusLabel = _statusLabel;
+    statusLabel = _statusLabel;
 }
 
-void GLSLComponent::setFragmentDocPtr(CodeDocument* _fragmentDoc)
+void GLSLComponent::setFragmentDocPtr (CodeDocument* _fragmentDoc)
 {
-	fragmentDoc = _fragmentDoc;
-}
-
-//==============================================================================
-void GLSLComponent::setShaderProgram(const String& vertexShader, const String& fragmentShader)
-{
-	newVertexShader = vertexShader;
-	newFragmentShader = fragmentShader;
-	isShaderCompileReady = true;
-}
-
-void GLSLComponent::setShaderProgramFragment(const String& _fragmentShader)
-{
-	newVertexShader = vertexShader;
-	newFragmentShader = _fragmentShader;
-	isShaderCompileReady = true;
-}
-
-void GLSLComponent::setShaderProgramVertex(const String& _vertexShader)
-{
-	newVertexShader = _vertexShader;
-	newFragmentShader = fragmentShader;
-	isShaderCompileReady = true;
+    fragmentDoc = _fragmentDoc;
 }
 
 //==============================================================================
-void GLSLComponent::setMidiCCValue(int ccNumber, float value)
+void GLSLComponent::setShaderProgram (const String& vertexShader, const String& fragmentShader)
 {
-	if (ccNumber < 128) {
-		m_midiCC[ccNumber] = value;
+    newVertexShader = vertexShader;
+    newFragmentShader = fragmentShader;
+    isShaderCompileReady = true;
+}
+
+void GLSLComponent::setShaderProgramFragment (const String& _fragmentShader)
+{
+    newVertexShader = vertexShader;
+    newFragmentShader = _fragmentShader;
+    isShaderCompileReady = true;
+}
+
+void GLSLComponent::setShaderProgramVertex (const String& _vertexShader)
+{
+    newVertexShader = _vertexShader;
+    newFragmentShader = fragmentShader;
+    isShaderCompileReady = true;
+}
+
+//==============================================================================
+void GLSLComponent::setMidiCCValue (int ccNumber, float value)
+{
+    if (ccNumber < 128)
+    {
+        m_midiCC[ccNumber] = value;
 #ifdef DEBUG
-		if (statusLabel != nullptr)
-		{
-			auto cText = statusLabel->getText();
-			cText += " /" + String(ccNumber) + "-" + String(value, 1);
-			statusLabel->setText(cText, dontSendNotification);
-		}
+        if (statusLabel != nullptr)
+        {
+            auto cText = statusLabel->getText();
+            cText += " /" + String (ccNumber) + "-" + String (value, 1);
+            statusLabel->setText (cText, dontSendNotification);
+        }
 #endif // DEBUG
-	}
+    }
 }
 
-void GLSLComponent::setSpectrumValue(int spectrumNumber, float value)
+void GLSLComponent::setSpectrumValue (int spectrumNumber, float value)
 {
-	if (spectrumNumber < 256) {
-		m_spectrum[spectrumNumber] = value;
-	}
+    if (spectrumNumber < 256)
+    {
+        m_spectrum[spectrumNumber] = value;
+    }
 }
 
-void GLSLComponent::setWaveValue(int waveNumber, float value)
+void GLSLComponent::setWaveValue (int waveNumber, float value)
 {
-	if (waveNumber < 256) {
-		m_wave[waveNumber] = value;
-	}
+    if (waveNumber < 256)
+    {
+        m_wave[waveNumber] = value;
+    }
 }
 
 //==============================================================================
 void GLSLComponent::handleAsyncUpdate()
 {
-	if (statusLabel != nullptr)
-		statusLabel->setText(statusText, dontSendNotification);
+    if (statusLabel != nullptr)
+        statusLabel->setText (statusText, dontSendNotification);
 }
 
 //==============================================================================
 void GLSLComponent::createShaders()
 {
-	if (!openGLContext.isAttached())
-		return;
+    if (! openGLContext.isAttached())
+        return;
 
-	if (!openGLContext.isActive())
-		return;
+    if (! openGLContext.isActive())
+        return;
 
-	std::unique_ptr<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
+    std::unique_ptr<OpenGLShaderProgram> newShader (new OpenGLShaderProgram (openGLContext));
 
-	if (newShader->addVertexShader(OpenGLHelpers::translateVertexShaderToV3(vertexShader))
-		&& newShader->addFragmentShader(OpenGLHelpers::translateFragmentShaderToV3(fragmentShader))
-		&& newShader->link())
-	{
-		shader = std::move(newShader);
-		shader->use();
+    if (newShader->addVertexShader (OpenGLHelpers::translateVertexShaderToV3 (vertexShader))
+        && newShader->addFragmentShader (OpenGLHelpers::translateFragmentShaderToV3 (fragmentShader))
+        && newShader->link())
+    {
+        shader = std::move (newShader);
+        shader->use();
 
-		shape.reset(new Shape(openGLContext));
-		attributes.reset(new Attributes(openGLContext, *shader));
-		uniforms.reset(new Uniforms(openGLContext, *shader));
+        shape.reset (new Shape (openGLContext));
+        attributes.reset (new Attributes (openGLContext, *shader));
+        uniforms.reset (new Uniforms (openGLContext, *shader));
 
-		statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
-		isShaderCompileSuccess = true;
+        statusText = "GLSL: v" + String (OpenGLShaderProgram::getLanguageVersion(), 2);
+        isShaderCompileSuccess = true;
 
-		StaticValues::setShaderCacheVerified(newFragmentShader);
-	}
-	else
-	{
-		statusText = newShader->getLastError();
-		isShaderCompileSuccess = false;
-	}
+        StaticValues::setShaderCacheVerified (newFragmentShader);
+    }
+    else
+    {
+        statusText = newShader->getLastError();
+        isShaderCompileSuccess = false;
+    }
 
-	isShaderCompileReady = false;
+    isShaderCompileReady = false;
 
-	triggerAsyncUpdate();
+    triggerAsyncUpdate();
 }
 
 void GLSLComponent::updateShader()
 {
-	if (!openGLContext.isAttached())
-		return;
+    if (! openGLContext.isAttached())
+        return;
 
-	if (!openGLContext.isActive())
-		return;
+    if (! openGLContext.isActive())
+        return;
 
-	if (newVertexShader.isNotEmpty() || newFragmentShader.isNotEmpty())
-	{
-		std::unique_ptr<OpenGLShaderProgram> newShader(new OpenGLShaderProgram(openGLContext));
+    if (newVertexShader.isNotEmpty() || newFragmentShader.isNotEmpty())
+    {
+        std::unique_ptr<OpenGLShaderProgram> newShader (new OpenGLShaderProgram (openGLContext));
 
-		if (newShader->addVertexShader(OpenGLHelpers::translateVertexShaderToV3(newVertexShader))
-			&& newShader->addFragmentShader(OpenGLHelpers::translateFragmentShaderToV3(newFragmentShader))
-			&& newShader->link())
-		{
-			shader = std::move(newShader);
-			shader->use();
+        if (newShader->addVertexShader (OpenGLHelpers::translateVertexShaderToV3 (newVertexShader))
+            && newShader->addFragmentShader (OpenGLHelpers::translateFragmentShaderToV3 (newFragmentShader))
+            && newShader->link())
+        {
+            shader = std::move (newShader);
+            shader->use();
 
-			shape.reset(new Shape(openGLContext));
-			attributes.reset(new Attributes(openGLContext, *shader));
-			uniforms.reset(new Uniforms(openGLContext, *shader));
+            shape.reset (new Shape (openGLContext));
+            attributes.reset (new Attributes (openGLContext, *shader));
+            uniforms.reset (new Uniforms (openGLContext, *shader));
 
-			statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
-			isShaderCompileSuccess = true;
+            statusText = "GLSL: v" + String (OpenGLShaderProgram::getLanguageVersion(), 2);
+            isShaderCompileSuccess = true;
 
-			StaticValues::setShaderCacheVerified(newFragmentShader);
-		}
-		else
-		{
-			statusText = newShader->getLastError();
-			isShaderCompileSuccess = false;
-		}
+            StaticValues::setShaderCacheVerified (newFragmentShader);
+        }
+        else
+        {
+            statusText = newShader->getLastError();
+            isShaderCompileSuccess = false;
+        }
 
-		newVertexShader = String();
-		newFragmentShader = String();
+        newVertexShader = String();
+        newFragmentShader = String();
 
-		isShaderCompileReady = false;
-	}
+        isShaderCompileReady = false;
+    }
 
-	triggerAsyncUpdate();
+    triggerAsyncUpdate();
 }
 
-void GLSLComponent::mouseDrag(const MouseEvent& event)
+void GLSLComponent::mouseDrag (const MouseEvent& event)
 {
-	mouseX = float(event.getPosition().getX()) / getWidth();
-	mouseY = 1.0f - float(event.getPosition().getY()) / getHeight();
+    mouseX = float (event.getPosition().getX()) / getWidth();
+    mouseY = 1.0f - float (event.getPosition().getY()) / getHeight();
 
-	mouseX = std::min(std::max(0.0f, mouseX), 1.0f);
-	mouseY = std::min(std::max(0.0f, mouseY), 1.0f);
+    mouseX = std::min (std::max (0.0f, mouseX), 1.0f);
+    mouseY = std::min (std::max (0.0f, mouseY), 1.0f);
 }
 
 Matrix3D<float> GLSLComponent::getProjectionMatrix() const
 {
-	float w = 1.0f / (0.5f + 0.1f);
-	float h = w * getLocalBounds().toFloat().getAspectRatio(false);
-	return Matrix3D<float>::fromFrustum(-w, w, -h, h, 4.0f, 30.0f);
+    float w = 1.0f / (0.5f + 0.1f);
+    float h = w * getLocalBounds().toFloat().getAspectRatio (false);
+    return Matrix3D<float>::fromFrustum (-w, w, -h, h, 4.0f, 30.0f);
 }
 
 Matrix3D<float> GLSLComponent::getViewMatrix() const
 {
-	Matrix3D<float> viewMatrix(Vector3D<float>(0.0f, 0.0f, -5.0f /*-10.0f*/));
-	Matrix3D<float> rotationMatrix = viewMatrix.rotation(Vector3D<float>(-0.3f, 5.0f * std::sin(getFrameCounter() * 0.01f), 0.0f));
+    Matrix3D<float> viewMatrix (Vector3D<float> (0.0f, 0.0f, -5.0f /*-10.0f*/));
+    Matrix3D<float> rotationMatrix = viewMatrix.rotation (Vector3D<float> (-0.3f, 5.0f * std::sin (getFrameCounter() * 0.01f), 0.0f));
 
-	return /*rotationMatrix * */viewMatrix;
+    return /*rotationMatrix * */ viewMatrix;
 }

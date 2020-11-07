@@ -15,17 +15,17 @@
 class StaticValues
 {
 public:
-	static const String getShaderCache();
-	static void setShaderCache(String str);
+    static const String getShaderCache();
+    static void setShaderCache (String str);
 
-	static const String getShaderCacheVerified();
-	static void setShaderCacheVerified(String str);
+    static const String getShaderCacheVerified();
+    static void setShaderCacheVerified (String str);
 
-	static bool getShaderCacheReady();
-	static void setShaderCacheReady(bool b);
+    static bool getShaderCacheReady();
+    static void setShaderCacheReady (bool b);
 
-	static bool getNeedShaderSync();
-	static void setNeedShaderSync(bool b);
+    static bool getNeedShaderSync();
+    static void setNeedShaderSync (bool b);
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StaticValues)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StaticValues)
 };

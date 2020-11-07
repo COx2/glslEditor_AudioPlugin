@@ -10,169 +10,170 @@
 #include "StaticValues.h"
 #include "PlayerWindow.h"
 
-PlayerWindow::PlayerWindow(String name)
-	: DocumentWindow(name, Colours::lightgrey, DocumentWindow::allButtons),
-	forwardFFT(fftOrder),
-	fifoIndex(0),
-	nextFFTBlockReady(false)
+PlayerWindow::PlayerWindow (String name)
+    : DocumentWindow (name, Colours::lightgrey, DocumentWindow::allButtons),
+      forwardFFT (fftOrder),
+      fifoIndex (0),
+      nextFFTBlockReady (false)
 {
-	addKeyListener(this);
+    addKeyListener (this);
 
-	setBackgroundColour(Colours::black);
+    setBackgroundColour (Colours::black);
 
-	setUsingNativeTitleBar(false);
-	setTitleBarHeight(TITLEBAR_HEIGHT);
+    setUsingNativeTitleBar (false);
+    setTitleBarHeight (TITLEBAR_HEIGHT);
 
-	setResizable(true, true);
-	centreWithSize(600, 600);
-	
-	m_GLSLCompo.setBounds(0, 0, getWidth(), getHeight());
-	setContentOwned(&m_GLSLCompo, true);
+    setResizable (true, true);
+    centreWithSize (600, 600);
 
-	setVisible(true);
-	startTimer(shaderLinkDelay);
+    m_GLSLCompo.setBounds (0, 0, getWidth(), getHeight());
+    setContentOwned (&m_GLSLCompo, true);
+
+    setVisible (true);
+    startTimer (shaderLinkDelay);
 }
 
 PlayerWindow::~PlayerWindow()
 {
-	stopTimer();
-	setContentNonOwned(&m_GLSLCompo, true);
+    stopTimer();
+    setContentNonOwned (&m_GLSLCompo, true);
 }
 
 void PlayerWindow::closeButtonPressed()
 {
-	// This is called when the user tries to close this window. Here, we'll just
-	// ask the app to quit when this happens, but you can change this to do
-	// whatever you need.
-	centreWithSize(600, 600);
+    // This is called when the user tries to close this window. Here, we'll just
+    // ask the app to quit when this happens, but you can change this to do
+    // whatever you need.
+    centreWithSize (600, 600);
 }
 
 void PlayerWindow::maximiseButtonPressed()
 {
-	setFullScreen(!isFullScreen());
+    setFullScreen (! isFullScreen());
 
-	if (isFullScreen())
-	{
-		setTitleBarHeight(0);
-	}
-	else
-	{
-		setTitleBarHeight(TITLEBAR_HEIGHT);
-	}
+    if (isFullScreen())
+    {
+        setTitleBarHeight (0);
+    }
+    else
+    {
+        setTitleBarHeight (TITLEBAR_HEIGHT);
+    }
 }
 
-bool PlayerWindow::keyPressed(const KeyPress& key, Component* originatingComponent)
+bool PlayerWindow::keyPressed (const KeyPress& key, Component* originatingComponent)
 {
-	if (key.getKeyCode() == key.escapeKey)
-	{
-		maximiseButtonPressed();
-	}
-	else if (key.getKeyCode() == key.tabKey)
-	{
-		updateShader();
-	}
-	return true;
+    if (key.getKeyCode() == key.escapeKey)
+    {
+        maximiseButtonPressed();
+    }
+    else if (key.getKeyCode() == key.tabKey)
+    {
+        updateShader();
+    }
+    return true;
 }
 
 //==============================================================================
 void PlayerWindow::timerCallback()
 {
-	if (StaticValues::getNeedShaderSync())
-	{
-		StaticValues::setNeedShaderSync(false);
-		
-		stopTimer();
+    if (StaticValues::getNeedShaderSync())
+    {
+        StaticValues::setNeedShaderSync (false);
 
-		if(m_GLSLCompo.isInitialised)
-			m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
-		
-		startTimer(20);
-	}
+        stopTimer();
 
-	// MIDI CC
-	if (!m_midiCCqueue.empty()) {
-		sendMidiCCValue();
-	}
+        if (m_GLSLCompo.isInitialised)
+            m_GLSLCompo.setShaderProgramFragment (StaticValues::getShaderCache());
 
-	// Wave
-	if (nextWaveBlockReady)
-	{
-		sendNextWave();
-		nextWaveBlockReady = false;
-	}
+        startTimer (20);
+    }
 
-	// FFT
-	if (nextFFTBlockReady)
-	{
-		sendNextSpectrum();
-		nextFFTBlockReady = false;
-	}
+    // MIDI CC
+    if (! m_midiCCqueue.empty())
+    {
+        sendMidiCCValue();
+    }
+
+    // Wave
+    if (nextWaveBlockReady)
+    {
+        sendNextWave();
+        nextWaveBlockReady = false;
+    }
+
+    // FFT
+    if (nextFFTBlockReady)
+    {
+        sendNextSpectrum();
+        nextFFTBlockReady = false;
+    }
 }
 
 void PlayerWindow::updateShader()
 {
-	m_GLSLCompo.setShaderProgramFragment(StaticValues::getShaderCache());
+    m_GLSLCompo.setShaderProgramFragment (StaticValues::getShaderCache());
 }
 
-void PlayerWindow::setMidiCCValue(juce::MidiMessage midiCC)
+void PlayerWindow::setMidiCCValue (juce::MidiMessage midiCC)
 {
-	m_midiCCqueue.push(midiCC);
+    m_midiCCqueue.push (midiCC);
 }
 
 void PlayerWindow::sendMidiCCValue()
 {
-	while (!m_midiCCqueue.empty())
-	{
-		juce::MidiMessage midiCC = m_midiCCqueue.front();
-		m_midiCCqueue.pop();
-		m_GLSLCompo.setMidiCCValue(midiCC.getControllerNumber(), midiCC.getControllerValue());
-	}
+    while (! m_midiCCqueue.empty())
+    {
+        juce::MidiMessage midiCC = m_midiCCqueue.front();
+        m_midiCCqueue.pop();
+        m_GLSLCompo.setMidiCCValue (midiCC.getControllerNumber(), midiCC.getControllerValue());
+    }
 }
 
-void PlayerWindow::pushNextSampleIntoFifo(float sample) noexcept
+void PlayerWindow::pushNextSampleIntoFifo (float sample) noexcept
 {
-	// if the fifo contains enough data, set a flag to say
-	// that the next line should now be rendered..
-	if (fifoIndex == fftSize)
-	{
-		if (!nextWaveBlockReady)
-		{
-			zeromem(waveData, sizeof(waveData));
-			memcpy(waveData, fifo, sizeof(fifo));
-			nextWaveBlockReady = true;
-		}
+    // if the fifo contains enough data, set a flag to say
+    // that the next line should now be rendered..
+    if (fifoIndex == fftSize)
+    {
+        if (! nextWaveBlockReady)
+        {
+            zeromem (waveData, sizeof (waveData));
+            memcpy (waveData, fifo, sizeof (fifo));
+            nextWaveBlockReady = true;
+        }
 
-		if (!nextFFTBlockReady)
-		{
-			zeromem(fftData, sizeof(fftData));
-			memcpy(fftData, fifo, sizeof(fifo));
-			nextFFTBlockReady = true;
-		}
+        if (! nextFFTBlockReady)
+        {
+            zeromem (fftData, sizeof (fftData));
+            memcpy (fftData, fifo, sizeof (fifo));
+            nextFFTBlockReady = true;
+        }
 
-		fifoIndex = 0;
-	}
+        fifoIndex = 0;
+    }
 
-	fifo[fifoIndex++] = sample;
+    fifo[fifoIndex++] = sample;
 }
 
 void PlayerWindow::sendNextSpectrum()
 {
-	// then render our FFT data..
-	forwardFFT.performFrequencyOnlyForwardTransform(fftData);
+    // then render our FFT data..
+    forwardFFT.performFrequencyOnlyForwardTransform (fftData);
 
-	// find the range of values produced, so we can scale our rendering to
-	// show up the detail clearly
-	for (int i = 0; i < fftSize; i++)
-	{
-		auto spectrumVal = fftData[i];
-		m_GLSLCompo.setSpectrumValue(i, spectrumVal * spectrumVal);
-	}
+    // find the range of values produced, so we can scale our rendering to
+    // show up the detail clearly
+    for (int i = 0; i < fftSize; i++)
+    {
+        auto spectrumVal = fftData[i];
+        m_GLSLCompo.setSpectrumValue (i, spectrumVal * spectrumVal);
+    }
 }
 
 void PlayerWindow::sendNextWave()
 {
-	for (int i = 0; i < fftSize; i++)
-	{
-		m_GLSLCompo.setWaveValue(i, waveData[i]);
-	}
+    for (int i = 0; i < fftSize; i++)
+    {
+        m_GLSLCompo.setWaveValue (i, waveData[i]);
+    }
 }

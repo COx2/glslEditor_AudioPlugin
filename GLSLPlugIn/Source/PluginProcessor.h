@@ -16,7 +16,7 @@
 //==============================================================================
 /**
 */
-class GlslplugInAudioProcessor  : public AudioProcessor
+class GlslplugInAudioProcessor : public AudioProcessor
 {
 public:
     //==============================================================================
@@ -27,9 +27,9 @@ public:
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
+#ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
+#endif
 
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
 
@@ -55,14 +55,14 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-	void createPlayerWindow();
-	void deletePlayerWindow();
-	bool existPlayerWindow() { return playerWindow != nullptr; };
+    void createPlayerWindow();
+    void deletePlayerWindow();
+    bool existPlayerWindow() { return playerWindow != nullptr; };
 
 private:
     //==============================================================================
-	//ScopedPointer<PlayerWindow> playerWindow;
-	PlayerWindow* playerWindow = nullptr;
+    //ScopedPointer<PlayerWindow> playerWindow;
+    PlayerWindow* playerWindow = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlslplugInAudioProcessor)
 };

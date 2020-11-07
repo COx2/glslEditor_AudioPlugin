@@ -54,8 +54,14 @@ public:
     //==============================================================================
     typedef juce::uint32 Index;
 
-    struct Vertex        { float x, y, z; };
-    struct TextureCoord  { float x, y;    };
+    struct Vertex
+    {
+        float x, y, z;
+    };
+    struct TextureCoord
+    {
+        float x, y;
+    };
 
     struct Mesh
     {
@@ -63,12 +69,12 @@ public:
         Array<TextureCoord> textureCoords;
         Array<Index> indices;
 
-        JUCE_LEAK_DETECTOR(Mesh)
+        JUCE_LEAK_DETECTOR (Mesh)
     };
 
     struct Material
     {
-        Material() noexcept  : shininess (1.0f), refractiveIndex (0.0f)
+        Material() noexcept : shininess (1.0f), refractiveIndex (0.0f)
         {
             zerostruct (ambient);
             zerostruct (diffuse);
@@ -83,11 +89,11 @@ public:
         float shininess, refractiveIndex;
 
         String ambientTextureName, diffuseTextureName,
-               specularTextureName, normalTextureName;
+            specularTextureName, normalTextureName;
 
         StringPairArray parameters;
 
-        JUCE_LEAK_DETECTOR(Material)
+        JUCE_LEAK_DETECTOR (Material)
     };
 
     struct Shape
@@ -96,7 +102,7 @@ public:
         Mesh mesh;
         Material material;
 
-        JUCE_LEAK_DETECTOR(Shape)
+        JUCE_LEAK_DETECTOR (Shape)
     };
 
     OwnedArray<Shape> shapes;
@@ -125,7 +131,7 @@ private:
 
         int vertexIndex, textureIndex, normalIndex;
 
-        JUCE_LEAK_DETECTOR(TripleIndex)
+        JUCE_LEAK_DETECTOR (TripleIndex)
     };
 
     struct IndexMap
@@ -154,7 +160,7 @@ private:
             return index;
         }
 
-        JUCE_LEAK_DETECTOR(IndexMap)
+        JUCE_LEAK_DETECTOR (IndexMap)
     };
 
     static float parseFloat (String::CharPointerType& t)
@@ -257,7 +263,7 @@ private:
             return CharacterFunctions::findEndOfToken (t, CharPointer_ASCII ("/ \t"), String().getCharPointer());
         }
 
-        JUCE_LEAK_DETECTOR(Face)
+        JUCE_LEAK_DETECTOR (Face)
     };
 
     static Shape* parseFaceGroup (const Mesh& srcMesh,
@@ -275,7 +281,7 @@ private:
         IndexMap indexMap;
 
         for (int i = 0; i < faceGroup.size(); ++i)
-            faceGroup.getUnchecked(i).addIndices (shape->mesh, srcMesh, indexMap);
+            faceGroup.getUnchecked (i).addIndices (shape->mesh, srcMesh, indexMap);
 
         return shape.release();
     }
@@ -293,10 +299,26 @@ private:
         {
             String::CharPointerType l = lines[lineNum].getCharPointer().findEndOfWhitespace();
 
-            if (matchToken (l, "v"))    { mesh.vertices.add (parseVertex (l));            continue; }
-            if (matchToken (l, "vn"))   { mesh.normals.add (parseVertex (l));             continue; }
-            if (matchToken (l, "vt"))   { mesh.textureCoords.add (parseTextureCoord (l)); continue; }
-            if (matchToken (l, "f"))    { faceGroup.add (Face (l));                       continue; }
+            if (matchToken (l, "v"))
+            {
+                mesh.vertices.add (parseVertex (l));
+                continue;
+            }
+            if (matchToken (l, "vn"))
+            {
+                mesh.normals.add (parseVertex (l));
+                continue;
+            }
+            if (matchToken (l, "vt"))
+            {
+                mesh.textureCoords.add (parseTextureCoord (l));
+                continue;
+            }
+            if (matchToken (l, "f"))
+            {
+                faceGroup.add (Face (l));
+                continue;
+            }
 
             if (matchToken (l, "usemtl"))
             {
@@ -304,9 +326,9 @@ private:
 
                 for (int i = knownMaterials.size(); --i >= 0;)
                 {
-                    if (knownMaterials.getReference(i).name == name)
+                    if (knownMaterials.getReference (i).name == name)
                     {
-                        lastMaterial = knownMaterials.getReference(i);
+                        lastMaterial = knownMaterials.getReference (i);
                         break;
                     }
                 }
@@ -355,20 +377,69 @@ private:
         {
             String::CharPointerType l (lines[i].getCharPointer().findEndOfWhitespace());
 
-            if (matchToken (l, "newmtl"))   { materials.add (material); material.name = String (l).trim(); continue; }
+            if (matchToken (l, "newmtl"))
+            {
+                materials.add (material);
+                material.name = String (l).trim();
+                continue;
+            }
 
-            if (matchToken (l, "Ka"))       { material.ambient         = parseVertex (l); continue; }
-            if (matchToken (l, "Kd"))       { material.diffuse         = parseVertex (l); continue; }
-            if (matchToken (l, "Ks"))       { material.specular        = parseVertex (l); continue; }
-            if (matchToken (l, "Kt"))       { material.transmittance   = parseVertex (l); continue; }
-            if (matchToken (l, "Ke"))       { material.emission        = parseVertex (l); continue; }
-            if (matchToken (l, "Ni"))       { material.refractiveIndex = parseFloat (l);  continue; }
-            if (matchToken (l, "Ns"))       { material.shininess       = parseFloat (l);  continue; }
+            if (matchToken (l, "Ka"))
+            {
+                material.ambient = parseVertex (l);
+                continue;
+            }
+            if (matchToken (l, "Kd"))
+            {
+                material.diffuse = parseVertex (l);
+                continue;
+            }
+            if (matchToken (l, "Ks"))
+            {
+                material.specular = parseVertex (l);
+                continue;
+            }
+            if (matchToken (l, "Kt"))
+            {
+                material.transmittance = parseVertex (l);
+                continue;
+            }
+            if (matchToken (l, "Ke"))
+            {
+                material.emission = parseVertex (l);
+                continue;
+            }
+            if (matchToken (l, "Ni"))
+            {
+                material.refractiveIndex = parseFloat (l);
+                continue;
+            }
+            if (matchToken (l, "Ns"))
+            {
+                material.shininess = parseFloat (l);
+                continue;
+            }
 
-            if (matchToken (l, "map_Ka"))   { material.ambientTextureName  = String (l).trim(); continue; }
-            if (matchToken (l, "map_Kd"))   { material.diffuseTextureName  = String (l).trim(); continue; }
-            if (matchToken (l, "map_Ks"))   { material.specularTextureName = String (l).trim(); continue; }
-            if (matchToken (l, "map_Ns"))   { material.normalTextureName   = String (l).trim(); continue; }
+            if (matchToken (l, "map_Ka"))
+            {
+                material.ambientTextureName = String (l).trim();
+                continue;
+            }
+            if (matchToken (l, "map_Kd"))
+            {
+                material.diffuseTextureName = String (l).trim();
+                continue;
+            }
+            if (matchToken (l, "map_Ks"))
+            {
+                material.specularTextureName = String (l).trim();
+                continue;
+            }
+            if (matchToken (l, "map_Ns"))
+            {
+                material.normalTextureName = String (l).trim();
+                continue;
+            }
 
             StringArray tokens;
             tokens.addTokens (l, " \t", "");
