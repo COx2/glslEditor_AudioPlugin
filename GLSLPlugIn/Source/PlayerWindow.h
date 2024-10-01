@@ -10,21 +10,22 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <juce_gui_extra/juce_gui_extra.h>
+#include <juce_dsp/juce_dsp.h>
 
 #include "GLSLComponent.h"
-#include <queue>
+
 //==============================================================================
 /*
 This class implements the desktop window that contains an instance of
 our MainContentComponent class.
 */
-class PlayerWindow : public DocumentWindow,
-                     public KeyListener,
-                     private Timer
+class PlayerWindow : public juce::DocumentWindow,
+                     public juce::KeyListener,
+                     private juce::Timer
 {
 public:
-    PlayerWindow (String name);
+    PlayerWindow (juce::String name);
     ~PlayerWindow();
 
     //==============================================================================
@@ -36,7 +37,7 @@ public:
 	*/
     void closeButtonPressed() override;
     void maximiseButtonPressed() override;
-    bool keyPressed (const KeyPress& key, Component* originatingComponent) override;
+    bool keyPressed (const juce::KeyPress& key, juce::Component* originatingComponent) override;
 
     void updateShader();
     void timerCallback() override;
@@ -65,7 +66,7 @@ private:
     void sendNextWave();
 
     // FFT
-    dsp::FFT forwardFFT;
+    juce::dsp::FFT forwardFFT;
     float fifo[fftSize];
     float fftData[2 * fftSize];
     int fifoIndex;

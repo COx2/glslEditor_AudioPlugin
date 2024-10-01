@@ -10,16 +10,16 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <juce_core/juce_core.h>
 
 class StaticValues
 {
 public:
-    static const String getShaderCache();
-    static void setShaderCache (String str);
+    static const juce::String getShaderCache();
+    static void setShaderCache (juce::String str);
 
-    static const String getShaderCacheVerified();
-    static void setShaderCacheVerified (String str);
+    static const juce::String getShaderCacheVerified();
+    static void setShaderCacheVerified (juce::String str);
 
     static bool getShaderCacheReady();
     static void setShaderCacheReady (bool b);

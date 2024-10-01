@@ -12,6 +12,9 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+// short hand.
+using namespace juce;
+
 //==============================================================================
 GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p), fragmentEditorComp (fragmentDocument, nullptr), forwardFFT (fftOrder), fifoIndex (0), nextFFTBlockReady (false)

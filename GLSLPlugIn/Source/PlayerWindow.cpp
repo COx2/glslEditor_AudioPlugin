@@ -10,6 +10,9 @@
 #include "StaticValues.h"
 #include "PlayerWindow.h"
 
+// short hand.
+using namespace juce;
+
 PlayerWindow::PlayerWindow (String name)
     : DocumentWindow (name, Colours::lightgrey, DocumentWindow::allButtons),
       forwardFFT (fftOrder),

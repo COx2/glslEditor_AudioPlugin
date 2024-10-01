@@ -11,15 +11,18 @@
 #include "PluginEditor.h"
 #include "StaticValues.h"
 
+// short hand.
+using namespace juce;
+
 //==============================================================================
 GlslplugInAudioProcessor::GlslplugInAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
     : AudioProcessor (BusesProperties()
 #if ! JucePlugin_IsMidiEffect
 #if ! JucePlugin_IsSynth
-                          .withInput ("Input", AudioChannelSet::stereo(), true)
+                          .withInput ("Input", juce::AudioChannelSet::stereo(), true)
 #endif
-                          .withOutput ("Output", AudioChannelSet::stereo(), true)
+                          .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
 #endif
     )
 #endif
@@ -45,7 +48,7 @@ void GlslplugInAudioProcessor::deletePlayerWindow()
 }
 
 //==============================================================================
-const String GlslplugInAudioProcessor::getName() const
+const juce::String GlslplugInAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
@@ -88,12 +91,12 @@ void GlslplugInAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const String GlslplugInAudioProcessor::getProgramName (int index)
+const juce::String GlslplugInAudioProcessor::getProgramName (int index)
 {
-    return String();
+    return juce::String();
 }
 
-void GlslplugInAudioProcessor::changeProgramName (int index, const String& newName)
+void GlslplugInAudioProcessor::changeProgramName (int index, const juce::String& newName)
 {
 }
 
@@ -119,8 +122,8 @@ bool GlslplugInAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 #else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
-    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
-        && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
+    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
+        && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
         // This checks if the input layout matches the output layout
@@ -134,15 +137,15 @@ bool GlslplugInAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 }
 #endif
 
-void GlslplugInAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+void GlslplugInAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer, juce::MidiBuffer& midiMessages)
 {
     auto editor = static_cast<GlslplugInAudioProcessorEditor*> (getActiveEditor());
 
     ///////////////////////////////////////////////////////////
     int time;
-    MidiMessage m;
+    juce::MidiMessage m;
 
-    for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
+    for (juce::MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         if (m.isNoteOn())
         {
@@ -209,20 +212,20 @@ bool GlslplugInAudioProcessor::hasEditor() const
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-AudioProcessorEditor* GlslplugInAudioProcessor::createEditor()
+juce::AudioProcessorEditor* GlslplugInAudioProcessor::createEditor()
 {
     return new GlslplugInAudioProcessorEditor (*this);
 }
 
 //==============================================================================
-void GlslplugInAudioProcessor::getStateInformation (MemoryBlock& destData)
+void GlslplugInAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 
-    XmlElement root ("Root");
-    XmlElement* el;
+    juce::XmlElement root ("Root");
+    juce::XmlElement* el;
     el = root.createNewChildElement ("FragmentShader");
     el->addTextElement (StaticValues::getShaderCache());
     copyXmlToBinary (root, destData);
@@ -241,7 +244,7 @@ void GlslplugInAudioProcessor::setStateInformation (const void* data, int sizeIn
         {
             if (pChild->hasTagName ("FragmentShader"))
             {
-                String text = pChild->getAllSubText();
+                juce::String text = pChild->getAllSubText();
                 StaticValues::setShaderCache (text);
             }
         }
@@ -250,7 +253,7 @@ void GlslplugInAudioProcessor::setStateInformation (const void* data, int sizeIn
 
 //==============================================================================
 // This creates new instances of the plugin..
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new GlslplugInAudioProcessor();
 }

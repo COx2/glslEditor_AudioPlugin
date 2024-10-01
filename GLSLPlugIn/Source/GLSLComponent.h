@@ -10,7 +10,9 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <juce_gui_extra/juce_gui_extra.h>
+#include <juce_opengl/juce_opengl.h>
+
 #include "GLSLTypes.h"
 
 //==============================================================================
@@ -18,8 +20,8 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class GLSLComponent : public OpenGLAppComponent,
-                      public AsyncUpdater
+class GLSLComponent : public juce::OpenGLAppComponent,
+                      public juce::AsyncUpdater
 {
 public:
     //==============================================================================
@@ -32,17 +34,17 @@ public:
     void render() override;
 
     //==============================================================================
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
 
     //==============================================================================
-    void setStatusLabelPtr (Label* _statusLabel);
-    void setFragmentDocPtr (CodeDocument* _fragmentDoc);
+    void setStatusLabelPtr (juce::Label* _statusLabel);
+    void setFragmentDocPtr (juce::CodeDocument* _fragmentDoc);
 
     //==============================================================================
-    void setShaderProgram (const String& vertexShader, const String& fragmentShader);
-    void setShaderProgramFragment (const String& _fragmentShader);
-    void setShaderProgramVertex (const String& _vertexShader);
+    void setShaderProgram (const juce::String& vertexShader, const juce::String& fragmentShader);
+    void setShaderProgramFragment (const juce::String& _fragmentShader);
+    void setShaderProgramVertex (const juce::String& _vertexShader);
 
     //==============================================================================
     void setMidiCCValue (int ccNumber, float value);
@@ -53,8 +55,8 @@ public:
     bool isInitialised = false;
     bool isShaderCompileSuccess = false;
 
-    static const String defaultVertexShader;
-    static const String defaultFragmentShader;
+    static const juce::String defaultVertexShader;
+    static const juce::String defaultFragmentShader;
 
 private:
     //==============================================================================
@@ -63,28 +65,28 @@ private:
     //==============================================================================
     void createShaders();
     void updateShader();
-    void mouseDrag (const MouseEvent& event) override;
+    void mouseDrag (const juce::MouseEvent& event) override;
 
     //==============================================================================
-    Matrix3D<float> getProjectionMatrix() const;
-    Matrix3D<float> getViewMatrix() const;
+    juce::Matrix3D<float> getProjectionMatrix() const;
+    juce::Matrix3D<float> getViewMatrix() const;
 
     //==============================================================================
-    String vertexShader;
-    String fragmentShader;
+    juce::String vertexShader;
+    juce::String fragmentShader;
 
-    String statusText {};
-    Label* statusLabel = nullptr;
-    CodeDocument* fragmentDoc = nullptr;
+    juce::String statusText {};
+    juce::Label* statusLabel = nullptr;
+    juce::CodeDocument* fragmentDoc = nullptr;
 
-    std::unique_ptr<OpenGLShaderProgram> shader;
+    std::unique_ptr<juce::OpenGLShaderProgram> shader;
     std::unique_ptr<Shape> shape;
     std::unique_ptr<Attributes> attributes;
     std::unique_ptr<Uniforms> uniforms;
 
     GLfloat timeCounter = 0.0f;
 
-    String newVertexShader, newFragmentShader;
+    juce::String newVertexShader, newFragmentShader;
     bool isShaderCompileReady = false;
     float mouseX, mouseY;
     float m_midiCC[128] = { 0 };

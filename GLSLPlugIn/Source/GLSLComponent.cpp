@@ -10,8 +10,11 @@
 #include "GLSLComponent.h"
 #include "StaticValues.h"
 
+// short hand.
+using namespace juce;
+
 //==============================================================================
-const String GLSLComponent::defaultVertexShader = String (std::string (R"(
+const juce::String GLSLComponent::defaultVertexShader = juce::String (std::string (R"(
 attribute vec3 position;
 attribute vec3 normal;
 attribute vec4 sourceColour;
@@ -36,7 +39,7 @@ void main()
     gl_Position = vec4(position, 1.0);
 })"));
 
-const String GLSLComponent::defaultFragmentShader = String (std::string (R"(
+const juce::String GLSLComponent::defaultFragmentShader = String (std::string (R"(
 #if JUCE_OPENGL_ES
 varying lowp vec4 destinationColour;
 varying lowp vec2 textureCoordOut;
@@ -121,10 +124,10 @@ void GLSLComponent::render()
     const float desktopScale = (float) openGLContext.getRenderingScale();
     OpenGLHelpers::clear (Colour::greyLevel (0.1f));
 
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    juce::gl::glEnable (juce::gl::GL_BLEND);
+    juce::gl::glBlendFunc (juce::gl::GL_SRC_ALPHA, juce::gl::GL_ONE_MINUS_SRC_ALPHA);
 
-    glViewport (0, 0, roundToInt (desktopScale * getWidth()), roundToInt (desktopScale * getHeight()));
+    juce::gl::glViewport (0, 0, roundToInt (desktopScale * getWidth()), roundToInt (desktopScale * getHeight()));
 
     shader->use();
 
@@ -174,8 +177,8 @@ void GLSLComponent::render()
     shape->draw (openGLContext, *attributes);
 
     // Reset the element buffers so child Components draw correctly
-    openGLContext.extensions.glBindBuffer (GL_ARRAY_BUFFER, 0);
-    openGLContext.extensions.glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
+    openGLContext.extensions.glBindBuffer (juce::gl::GL_ARRAY_BUFFER, 0);
+    openGLContext.extensions.glBindBuffer (juce::gl::GL_ELEMENT_ARRAY_BUFFER, 0);
 
     /**/
     timeCounter += 0.02f;
@@ -366,7 +369,7 @@ Matrix3D<float> GLSLComponent::getProjectionMatrix() const
 
 Matrix3D<float> GLSLComponent::getViewMatrix() const
 {
-    Matrix3D<float> viewMatrix (Vector3D<float> (0.0f, 0.0f, -5.0f /*-10.0f*/));
+    Matrix3D<float> viewMatrix (Matrix3D<float>::fromTranslation(Vector3D<float> (0.0f, 0.0f, -5.0f /*-10.0f*/)));
     Matrix3D<float> rotationMatrix = viewMatrix.rotation (Vector3D<float> (-0.3f, 5.0f * std::sin (getFrameCounter() * 0.01f), 0.0f));
 
     return /*rotationMatrix * */ viewMatrix;

@@ -10,25 +10,26 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <juce_audio_utils/juce_audio_utils.h>
+#include <juce_dsp/juce_dsp.h>
+
 #include "PluginProcessor.h"
 
-#include <queue>
 //==============================================================================
 /**
 */
-class GlslplugInAudioProcessorEditor : public AudioProcessorEditor,
-                                       public CodeDocument::Listener,
-                                       public KeyListener,
-                                       public Button::Listener,
-                                       private Timer
+class GlslplugInAudioProcessorEditor : public juce::AudioProcessorEditor,
+                                       public juce::CodeDocument::Listener,
+                                       public juce::KeyListener,
+                                       public juce::Button::Listener,
+                                       private juce::Timer
 {
 public:
     GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor&);
     ~GlslplugInAudioProcessorEditor();
 
     //==============================================================================
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
     void resized() override;
     void timerCallback() override;
     void setMidiCCValue (juce::MidiMessage midiCC);
@@ -41,12 +42,12 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     GLSLComponent m_GLSLCompo;
-    Label m_statusLabel;
-    CodeDocument /*vertexDocument,*/ fragmentDocument;
-    CodeEditorComponent /*vertexEditorComp,*/ fragmentEditorComp;
-    ToggleButton m_SyncModeSwitch;
-    TextButton m_SyncButton;
-    TextButton m_PlayWndButton;
+    juce::Label m_statusLabel;
+    juce::CodeDocument /*vertexDocument,*/ fragmentDocument;
+    juce::CodeEditorComponent /*vertexEditorComp,*/ fragmentEditorComp;
+    juce::ToggleButton m_SyncModeSwitch;
+    juce::TextButton m_SyncButton;
+    juce::TextButton m_PlayWndButton;
 
     enum
     {
@@ -57,7 +58,7 @@ private:
         fftOrder = 9,
         fftSize = 1 << fftOrder
     };
-    void codeDocumentTextInserted (const String& /*newText*/, int /*insertIndex*/) override;
+    void codeDocumentTextInserted (const juce::String& /*newText*/, int /*insertIndex*/) override;
     void codeDocumentTextDeleted (int /*startIndex*/, int /*endIndex*/) override;
 
     std::queue<juce::MidiMessage> m_midiCCqueue;
@@ -66,7 +67,7 @@ private:
     void sendNextWave();
 
     // FFT
-    dsp::FFT forwardFFT;
+    juce::dsp::FFT forwardFFT;
     float fifo[fftSize];
     float fftData[2 * fftSize];
     int fifoIndex;
@@ -78,10 +79,10 @@ private:
 
     // KeyListener
     //bool keyPressed(const KeyPress& key) override;
-    bool keyPressed (const KeyPress& key, Component* originatingComponent) override;
+    bool keyPressed (const juce::KeyPress& key, Component* originatingComponent) override;
 
     /** Called when the button is clicked. */
-    virtual void buttonClicked (Button*) override;
+    virtual void buttonClicked (juce::Button*) override;
 
     bool isShaderSyncAuto = false;
     bool isNeedShaderCompile = false;

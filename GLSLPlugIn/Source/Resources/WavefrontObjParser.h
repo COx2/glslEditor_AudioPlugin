@@ -39,13 +39,13 @@ class WavefrontObjFile
 public:
     WavefrontObjFile() {}
 
-    Result load (const String& objFileContent)
+    juce::Result load (const juce::String& objFileContent)
     {
         shapes.clear();
-        return parseObjFile (StringArray::fromLines (objFileContent));
+        return parseObjFile (juce::StringArray::fromLines (objFileContent));
     }
 
-    Result load (const File& file)
+    juce::Result load (const juce::File& file)
     {
         sourceFile = file;
         return load (file.loadFileAsString());
@@ -65,9 +65,9 @@ public:
 
     struct Mesh
     {
-        Array<Vertex> vertices, normals;
-        Array<TextureCoord> textureCoords;
-        Array<Index> indices;
+        juce::Array<Vertex> vertices, normals;
+        juce::Array<TextureCoord> textureCoords;
+        juce::Array<Index> indices;
 
         JUCE_LEAK_DETECTOR (Mesh)
     };
@@ -76,40 +76,40 @@ public:
     {
         Material() noexcept : shininess (1.0f), refractiveIndex (0.0f)
         {
-            zerostruct (ambient);
-            zerostruct (diffuse);
-            zerostruct (specular);
-            zerostruct (transmittance);
-            zerostruct (emission);
+            juce::zerostruct (ambient);
+            juce::zerostruct (diffuse);
+            juce::zerostruct (specular);
+            juce::zerostruct (transmittance);
+            juce::zerostruct (emission);
         }
 
-        String name;
+        juce::String name;
 
         Vertex ambient, diffuse, specular, transmittance, emission;
         float shininess, refractiveIndex;
 
-        String ambientTextureName, diffuseTextureName,
+        juce::String ambientTextureName, diffuseTextureName,
             specularTextureName, normalTextureName;
 
-        StringPairArray parameters;
+        juce::StringPairArray parameters;
 
         JUCE_LEAK_DETECTOR (Material)
     };
 
     struct Shape
     {
-        String name;
+        juce::String name;
         Mesh mesh;
         Material material;
 
         JUCE_LEAK_DETECTOR (Shape)
     };
 
-    OwnedArray<Shape> shapes;
+    juce::OwnedArray<Shape> shapes;
 
 private:
     //==============================================================================
-    File sourceFile;
+    juce::File sourceFile;
 
     struct TripleIndex
     {
@@ -147,13 +147,13 @@ private:
 
             const Index index = (Index) newMesh.vertices.size();
 
-            if (isPositiveAndBelow (i.vertexIndex, srcMesh.vertices.size()))
+            if (juce::isPositiveAndBelow (i.vertexIndex, srcMesh.vertices.size()))
                 newMesh.vertices.add (srcMesh.vertices.getReference (i.vertexIndex));
 
-            if (isPositiveAndBelow (i.normalIndex, srcMesh.normals.size()))
+            if (juce::isPositiveAndBelow (i.normalIndex, srcMesh.normals.size()))
                 newMesh.normals.add (srcMesh.normals.getReference (i.normalIndex));
 
-            if (isPositiveAndBelow (i.textureIndex, srcMesh.textureCoords.size()))
+            if (juce::isPositiveAndBelow (i.textureIndex, srcMesh.textureCoords.size()))
                 newMesh.textureCoords.add (srcMesh.textureCoords.getReference (i.textureIndex));
 
             map[i] = index;
@@ -163,13 +163,13 @@ private:
         JUCE_LEAK_DETECTOR (IndexMap)
     };
 
-    static float parseFloat (String::CharPointerType& t)
+    static float parseFloat (juce::String::CharPointerType& t)
     {
         t = t.findEndOfWhitespace();
-        return (float) CharacterFunctions::readDoubleValue (t);
+        return (float)juce::CharacterFunctions::readDoubleValue (t);
     }
 
-    static Vertex parseVertex (String::CharPointerType t)
+    static Vertex parseVertex (juce::String::CharPointerType t)
     {
         Vertex v;
         v.x = parseFloat (t);
@@ -178,7 +178,7 @@ private:
         return v;
     }
 
-    static TextureCoord parseTextureCoord (String::CharPointerType t)
+    static TextureCoord parseTextureCoord (juce::String::CharPointerType t)
     {
         TextureCoord tc;
         tc.x = parseFloat (t);
@@ -186,13 +186,13 @@ private:
         return tc;
     }
 
-    static bool matchToken (String::CharPointerType& t, const char* token)
+    static bool matchToken (juce::String::CharPointerType& t, const char* token)
     {
         const int len = (int) strlen (token);
 
-        if (CharacterFunctions::compareUpTo (CharPointer_ASCII (token), t, len) == 0)
+        if (juce::CharacterFunctions::compareUpTo (juce::CharPointer_ASCII (token), t, len) == 0)
         {
-            String::CharPointerType end = t + len;
+            juce::String::CharPointerType end = t + len;
 
             if (end.isEmpty() || end.isWhitespace())
             {
@@ -206,13 +206,13 @@ private:
 
     struct Face
     {
-        Face (String::CharPointerType t)
+        Face (juce::String::CharPointerType t)
         {
             while (! t.isEmpty())
                 triples.add (parseTriple (t));
         }
 
-        Array<TripleIndex> triples;
+        juce::Array<TripleIndex> triples;
 
         void addIndices (Mesh& newMesh, const Mesh& srcMesh, IndexMap& indexMap)
         {
@@ -229,7 +229,7 @@ private:
             }
         }
 
-        static TripleIndex parseTriple (String::CharPointerType& t)
+        static TripleIndex parseTriple (juce::String::CharPointerType& t)
         {
             TripleIndex i;
 
@@ -258,23 +258,23 @@ private:
             return i;
         }
 
-        static String::CharPointerType findEndOfFaceToken (String::CharPointerType t) noexcept
+        static juce::String::CharPointerType findEndOfFaceToken (juce::String::CharPointerType t) noexcept
         {
-            return CharacterFunctions::findEndOfToken (t, CharPointer_ASCII ("/ \t"), String().getCharPointer());
+            return juce::CharacterFunctions::findEndOfToken (t, juce::CharPointer_ASCII ("/ \t"), juce::String().getCharPointer());
         }
 
         JUCE_LEAK_DETECTOR (Face)
     };
 
     static Shape* parseFaceGroup (const Mesh& srcMesh,
-                                  const Array<Face>& faceGroup,
+                                  const juce::Array<Face>& faceGroup,
                                   const Material& material,
-                                  const String& name)
+                                  const juce::String& name)
     {
         if (faceGroup.size() == 0)
             return nullptr;
 
-        ScopedPointer<Shape> shape (new Shape());
+        juce::ScopedPointer<Shape> shape (new Shape());
         shape->name = name;
         shape->material = material;
 
@@ -286,18 +286,18 @@ private:
         return shape.release();
     }
 
-    Result parseObjFile (const StringArray& lines)
+    juce::Result parseObjFile (const juce::StringArray& lines)
     {
         Mesh mesh;
-        Array<Face> faceGroup;
+        juce::Array<Face> faceGroup;
 
-        Array<Material> knownMaterials;
+        juce::Array<Material> knownMaterials;
         Material lastMaterial;
-        String lastName;
+        juce::String lastName;
 
         for (int lineNum = 0; lineNum < lines.size(); ++lineNum)
         {
-            String::CharPointerType l = lines[lineNum].getCharPointer().findEndOfWhitespace();
+            juce::String::CharPointerType l = lines[lineNum].getCharPointer().findEndOfWhitespace();
 
             if (matchToken (l, "v"))
             {
@@ -322,7 +322,7 @@ private:
 
             if (matchToken (l, "usemtl"))
             {
-                const String name (String (l).trim());
+                const juce::String name (juce::String (l).trim());
 
                 for (int i = knownMaterials.size(); --i >= 0;)
                 {
@@ -338,7 +338,7 @@ private:
 
             if (matchToken (l, "mtllib"))
             {
-                Result r = parseMaterial (knownMaterials, String (l).trim());
+                juce::Result r = parseMaterial (knownMaterials, juce::String (l).trim());
                 continue;
             }
 
@@ -348,7 +348,7 @@ private:
                     shapes.add (shape);
 
                 faceGroup.clear();
-                lastName = StringArray::fromTokens (l, " \t", "")[0];
+                lastName = juce::StringArray::fromTokens (l, " \t", "")[0];
                 continue;
             }
         }
@@ -356,18 +356,18 @@ private:
         if (Shape* shape = parseFaceGroup (mesh, faceGroup, lastMaterial, lastName))
             shapes.add (shape);
 
-        return Result::ok();
+        return juce::Result::ok();
     }
 
-    Result parseMaterial (Array<Material>& materials, const String& filename)
+    juce::Result parseMaterial (juce::Array<Material>& materials, const juce::String& filename)
     {
         jassert (sourceFile.exists());
-        File f (sourceFile.getSiblingFile (filename));
+        juce::File f (sourceFile.getSiblingFile (filename));
 
         if (! f.exists())
-            return Result::fail ("Cannot open file: " + filename);
+            return juce::Result::fail ("Cannot open file: " + filename);
 
-        StringArray lines;
+        juce::StringArray lines;
         lines.addLines (f.loadFileAsString());
 
         materials.clear();
@@ -375,12 +375,12 @@ private:
 
         for (int i = 0; i < lines.size(); ++i)
         {
-            String::CharPointerType l (lines[i].getCharPointer().findEndOfWhitespace());
+            juce::String::CharPointerType l (lines[i].getCharPointer().findEndOfWhitespace());
 
             if (matchToken (l, "newmtl"))
             {
                 materials.add (material);
-                material.name = String (l).trim();
+                material.name = juce::String (l).trim();
                 continue;
             }
 
@@ -422,26 +422,26 @@ private:
 
             if (matchToken (l, "map_Ka"))
             {
-                material.ambientTextureName = String (l).trim();
+                material.ambientTextureName = juce::String (l).trim();
                 continue;
             }
             if (matchToken (l, "map_Kd"))
             {
-                material.diffuseTextureName = String (l).trim();
+                material.diffuseTextureName = juce::String (l).trim();
                 continue;
             }
             if (matchToken (l, "map_Ks"))
             {
-                material.specularTextureName = String (l).trim();
+                material.specularTextureName = juce::String (l).trim();
                 continue;
             }
             if (matchToken (l, "map_Ns"))
             {
-                material.normalTextureName = String (l).trim();
+                material.normalTextureName = juce::String (l).trim();
                 continue;
             }
 
-            StringArray tokens;
+            juce::StringArray tokens;
             tokens.addTokens (l, " \t", "");
 
             if (tokens.size() >= 2)
@@ -449,7 +449,7 @@ private:
         }
 
         materials.add (material);
-        return Result::ok();
+        return juce::Result::ok();
     }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WavefrontObjFile)
