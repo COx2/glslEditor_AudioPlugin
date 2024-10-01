@@ -67,7 +67,7 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
     m_PlayWndButton.addListener (this);
     addAndMakeVisible (m_PlayWndButton);
 
-    fragmentDocument.replaceAllContent (GLSLComponent::defaultFragmentShader);
+    fragmentDocument.replaceAllContent (GLSLComponent::getShaderPresets().getReference(3).fragmentShader);
 
     startTimer (shaderLinkDelay);
 }

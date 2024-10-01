@@ -197,7 +197,7 @@ private:
             openGLContext.extensions.glBufferData (juce::gl::GL_ARRAY_BUFFER,
                                                    static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof (Vertex)),
                                                    vertices.getRawDataPointer(),
-                juce::gl::GL_STATIC_DRAW);
+                                                   juce::gl::GL_STATIC_DRAW);
 
             openGLContext.extensions.glGenBuffers (1, &indexBuffer);
             openGLContext.extensions.glBindBuffer (juce::gl::GL_ELEMENT_ARRAY_BUFFER, indexBuffer);

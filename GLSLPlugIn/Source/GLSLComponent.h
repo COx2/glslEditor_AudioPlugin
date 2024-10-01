@@ -58,6 +58,13 @@ public:
     static const juce::String defaultVertexShader;
     static const juce::String defaultFragmentShader;
 
+    struct ShaderPreset
+    {
+        const char* name;
+        const char* fragmentShader;
+    };
+
+    static juce::Array<ShaderPreset> getShaderPresets();
 private:
     //==============================================================================
     virtual void handleAsyncUpdate() override;
