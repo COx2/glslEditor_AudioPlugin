@@ -13,7 +13,7 @@ License : MIT
 
 [JUCE JAPAN / Outlaw Faction](http://oufac.com/ "Outlaw Faction")
 
-Require : JUCE v6.0.0
+Require : CMake 3.22+ (JUCE is fetched automatically, see Building below)
 
 ## What is this project? ##
 GLSL Editor running on VST/AU plugin host Applications Cubase, StudioOne, Ableton Live, Logic, and more...
@@ -28,6 +28,7 @@ This demo movie has copy and paste the glsl codes from "GLSL Sandbox Gallery".
 + VST
 + VST3
 + AudioUnit
++ CLAP
 + Stand-alone executable
 
 ## Usage / uniform variables
@@ -65,37 +66,79 @@ uniform float spectrum[256]:
  The range of values ​​stored in each array is roughly 0 to 1, depending on the DAW.
  ~~~
 
+## Keyboard Shortcuts ##
+
+The plugin window is resizable (drag any corner/edge) so you can give the code
+editor more room for long shader lines. In addition:
+
+| Shortcut | Effect |
+|---|---|
+| Ctrl + K | Toggle "Preview Only" (fullscreen GLSL render, hides the code editor) |
+| Ctrl + P | Toggle "Editor Only" (fullscreen code editor, hides the GLSL preview) |
+| Ctrl + `+` (or `;`) | Increase the code editor's font size |
+| Ctrl + `-` | Decrease the code editor's font size |
+
+Note: this is the Ctrl key specifically, even on macOS (not Cmd).
+
 ## Building ##
 
-So I've built under Windows and Mac OS X.
+The project uses CMake with JUCE fetched automatically via `FetchContent` — there's no
+Projucer project and no separate JUCE download/checkout needed.
 
-### Windows Build Instructions ###
+### Requirements ###
 
-1. Download Juce (http://www.juce.com/)
-2. Download the VST SDK (http://www.steinberg.net/en/company/developers.html)
-3. Run "The Projucer" executable included in Juce.
-4. Open juce project file "xxx.jucer"
-   - Make any changes to the configure and build options.
-   - Save juce project if modified
-5. Hit "Save Project and Open in Visual Studio". I use Visual Studio 2015.
-6. Select the build: "Release - x64" and set platform to x64(64bit). Otherwise, "Release - Win32" and set platform to x86(32bit).
-7. Build and deploy to plugin folder.
+* CMake 3.22 or newer
+* A C++ compiler:
+  * Windows: Visual Studio 2019 or newer
+  * macOS: Xcode (command line tools)
+* An internet connection for the first configure (CMake downloads JUCE 8.0.15 automatically)
 
-### Mac OS X Build Instructions ###
+### Build Instructions (Windows, macOS) ###
 
-1. Download Juce (http://www.juce.com/)
-2. Download the VST SDK (http://www.steinberg.net/en/company/developers.html)
-3. Run "The Projucer" executable included in Juce.
-4. Open juce project file "xxx.jucer"
-   - Make any changes to the configure and build options.
-   - Save juce project if modified
-5. Hit "Save Project and Open in Xcode". I use Xcode 7.
-6. Select the architecture x64(64bit) or x86(32bit).
-7. On default setting, When build succeed and automatically deploy to plugin directory.
+```sh
+# Configure (downloads JUCE and clap-juce-extensions into build/_deps on first run)
+cmake -B build
 
+# Build the Standalone, VST3, and CLAP targets, Release configuration
+cmake --build build --config Release
+```
+
+To build a single format instead of everything:
+
+```sh
+cmake --build build --target GLSLPlugIn_Standalone --config Release
+cmake --build build --target GLSLPlugIn_VST3 --config Release
+cmake --build build --target GLSLPlugIn_CLAP --config Release
+```
+
+Build products are placed under `build/GLSLPlugIn/GLSLPlugIn_artefacts/Release/`
+(`Standalone/GLSLPlugIn.app` or `.exe`, `VST3/GLSLPlugIn.vst3`, and `CLAP/GLSLPlugIn.clap`).
+
+CLAP support comes from the third-party [clap-juce-extensions](https://github.com/free-audio/clap-juce-extensions)
+project (JUCE itself has no native CLAP format) - it's fetched automatically alongside JUCE, no extra setup needed.
+
+On Windows, `cmake -B build` uses the Visual Studio generator by default, producing a
+solution you can also open and build directly in the IDE. On macOS, pass `-G Xcode`
+if you'd rather work from an Xcode project:
+
+```sh
+cmake -B build -G Xcode
+```
+
+### Testing shaders headlessly ###
+
+The Standalone build accepts a `-i`/`--input <file>` flag that loads a fragment
+shader from disk, compiles it exactly as if it had been pasted into the editor,
+prints `OK: ...` or `ERROR: ...` (the same message the status bar would show) to
+the console, and exits with code 0 on success or 1 on failure. This is useful for
+scripting/CI, or for diagnosing driver-specific shader compile issues without
+having to drive the GUI:
+
+```sh
+build/GLSLPlugIn/GLSLPlugIn_artefacts/Standalone/GLSLPlugIn --input examples/plasma_time.frag
+```
 
 ### Technologies Used ###
   * C++ for the language
-  * JUCE for the framework/library
-  * Steinberg VST SDK
-  * Visual Studio for the IDE
+  * JUCE (fetched via CMake `FetchContent`) for the framework/library
+  * CMake for the build system

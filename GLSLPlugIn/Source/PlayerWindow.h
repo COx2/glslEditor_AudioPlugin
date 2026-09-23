@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 
 #include "GLSLComponent.h"
 #include <queue>
@@ -25,9 +25,11 @@ class PlayerWindow : public DocumentWindow,
 {
 public:
     PlayerWindow (String name);
-    ~PlayerWindow();
+    ~PlayerWindow() override;
 
     //==============================================================================
+    using Component::keyPressed;
+
     /* Note: Be careful if you override any DocumentWindow methods - the base
 	class uses a lot of them, so by overriding you might break its functionality.
 	It's best to do all your work in your content component instead, but if
@@ -74,9 +76,6 @@ private:
     // Wave
     bool nextWaveBlockReady;
     float waveData[fftSize];
-
-    bool isCodeEditorShow = true;
-    bool isNeedShaderCompile = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PlayerWindow)
 };

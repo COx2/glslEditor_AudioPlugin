@@ -30,18 +30,31 @@ GlslplugInAudioProcessor::GlslplugInAudioProcessor()
 
 GlslplugInAudioProcessor::~GlslplugInAudioProcessor()
 {
-    delete playerWindow; // (deletes our window)
+    deletePlayerWindow();
 }
 
 void GlslplugInAudioProcessor::createPlayerWindow()
 {
-    playerWindow = new PlayerWindow ("GLSL Player");
+    // Build the window before publishing the pointer, and keep the lock scope
+    // limited to the pointer swap - the audio thread should never be blocked for
+    // longer than that.
+    auto* newWindow = new PlayerWindow ("GLSL Player");
+
+    const ScopedLock sl (playerWindowLock);
+    playerWindow = newWindow;
 }
 
 void GlslplugInAudioProcessor::deletePlayerWindow()
 {
-    delete playerWindow;
-    playerWindow = nullptr;
+    PlayerWindow* oldWindow = nullptr;
+
+    {
+        const ScopedLock sl (playerWindowLock);
+        oldWindow = playerWindow;
+        playerWindow = nullptr;
+    }
+
+    delete oldWindow;
 }
 
 //==============================================================================
@@ -84,21 +97,21 @@ int GlslplugInAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void GlslplugInAudioProcessor::setCurrentProgram (int index)
+void GlslplugInAudioProcessor::setCurrentProgram (int)
 {
 }
 
-const String GlslplugInAudioProcessor::getProgramName (int index)
+const String GlslplugInAudioProcessor::getProgramName (int)
 {
     return String();
 }
 
-void GlslplugInAudioProcessor::changeProgramName (int index, const String& newName)
+void GlslplugInAudioProcessor::changeProgramName (int, const String&)
 {
 }
 
 //==============================================================================
-void GlslplugInAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void GlslplugInAudioProcessor::prepareToPlay (double, int)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
@@ -139,11 +152,11 @@ void GlslplugInAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuff
     auto editor = static_cast<GlslplugInAudioProcessorEditor*> (getActiveEditor());
 
     ///////////////////////////////////////////////////////////
-    int time;
-    MidiMessage m;
-
-    for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
+    for (const auto metadata : midiMessages)
     {
+        const auto m = metadata.getMessage();
+
+
         if (m.isNoteOn())
         {
         }
@@ -161,8 +174,11 @@ void GlslplugInAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuff
             if (editor != nullptr)
                 editor->setMidiCCValue (m);
 
-            if (playerWindow != nullptr)
-                playerWindow->setMidiCCValue (m);
+            {
+                const ScopedLock sl (playerWindowLock);
+                if (playerWindow != nullptr)
+                    playerWindow->setMidiCCValue (m);
+            }
         }
     }
 
@@ -194,10 +210,11 @@ void GlslplugInAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuff
                     editor->pushNextSampleIntoFifo (channelData[i]);
             }
 
-            if (playerWindow != nullptr)
             {
-                for (int i = 0; i < buffer.getNumSamples(); ++i)
-                    playerWindow->pushNextSampleIntoFifo (channelData[i]);
+                const ScopedLock sl (playerWindowLock);
+                if (playerWindow != nullptr)
+                    for (int i = 0; i < buffer.getNumSamples(); ++i)
+                        playerWindow->pushNextSampleIntoFifo (channelData[i]);
             }
         }
     }

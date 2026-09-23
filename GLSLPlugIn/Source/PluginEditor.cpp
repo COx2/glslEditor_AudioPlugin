@@ -12,13 +12,17 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include <iostream>
+
 //==============================================================================
 GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), fragmentEditorComp (fragmentDocument, nullptr), forwardFFT (fftOrder), fifoIndex (0), nextFFTBlockReady (false)
+    : AudioProcessorEditor (&p), audioProcessor (p), fragmentEditorComp (fragmentDocument, nullptr), forwardFFT (fftOrder), fifoIndex (0), nextFFTBlockReady (false)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (wndFullSizeW, wndFullSizeH);
+    setResizable (true, true);
+    setResizeLimits (400, 300, 3840, 2160);
     getTopLevelComponent()->addKeyListener (this);
 
     m_GLSLCompo.setStatusLabelPtr (&m_statusLabel);
@@ -39,7 +43,7 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
     m_statusLabel.setJustificationType (Justification::topLeft);
     m_statusLabel.setColour (Label::backgroundColourId, windowBackground);
     m_statusLabel.setColour (Label::textColourId, windowForeground);
-    m_statusLabel.setFont (Font (14.0f));
+    m_statusLabel.setFont (Font (FontOptions().withHeight (14.0f)));
     addAndMakeVisible (m_statusLabel);
 
     m_SyncModeSwitch.setToggleState (false, dontSendNotification);
@@ -66,7 +70,47 @@ GlslplugInAudioProcessorEditor::GlslplugInAudioProcessorEditor (GlslplugInAudioP
 
     fragmentDocument.replaceAllContent (GLSLComponent::defaultFragmentShader);
 
+    checkForCommandLineInput();
+
     startTimer (shaderLinkDelay);
+}
+
+void GlslplugInAudioProcessorEditor::checkForCommandLineInput()
+{
+    const auto args = JUCEApplicationBase::getCommandLineParameterArray();
+    String inputPath;
+
+    for (int i = 0; i < args.size(); ++i)
+    {
+        if (args[i] == "-i" || args[i] == "--input")
+        {
+            if (i + 1 < args.size())
+                inputPath = args[i + 1];
+
+            break;
+        }
+    }
+
+    if (inputPath.isEmpty())
+        return;
+
+    File shaderFile (inputPath);
+
+    if (! shaderFile.existsAsFile())
+    {
+        std::cerr << "error: cannot read shader file: " << inputPath << std::endl;
+
+        if (auto* app = JUCEApplicationBase::getInstance())
+        {
+            app->setApplicationReturnValue (1);
+            JUCEApplicationBase::quit();
+        }
+
+        return;
+    }
+
+    commandLineInputSource = shaderFile.loadFileAsString();
+    commandLineInputPending = true;
 }
 
 GlslplugInAudioProcessorEditor::~GlslplugInAudioProcessorEditor()
@@ -82,21 +126,21 @@ void GlslplugInAudioProcessorEditor::paint (Graphics& g)
 
 void GlslplugInAudioProcessorEditor::resized()
 {
-    Rectangle<int> area (getLocalBounds().reduced (4));
-    Rectangle<int> bottom (area.removeFromBottom (75));
-
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
-    int glSide = wndFullSizeH;
-    int glBottom = wndFullSizeH;
-    m_GLSLCompo.setBounds (0, 0, glSide, glBottom);
-
-    int editorBottom = wndFullSizeH - 80;
-    int editorSide = wndFullSizeW - wndFullSizeH;
+    // Lay out from the editor's *current* size (rather than the fixed
+    // wndFullSizeW/H constants) so the window can actually be resized -
+    // dragging the corner, or a host resizing us, ends up here too.
+    const int width = getWidth();
+    const int height = getHeight();
 
     switch (m_guiState)
     {
         case GUIState::Default:
+        {
+            const int glSide = height;
+            const int editorBottom = height - 80;
+            const int editorSide = width - glSide;
+
+            m_GLSLCompo.setBounds (0, 0, glSide, height);
             fragmentEditorComp.setBounds (glSide, 0, editorSide, editorBottom);
             m_statusLabel.setBounds (glSide, editorBottom, editorSide, 60);
             m_SyncModeSwitch.setBounds (glSide, editorBottom + 60, 108, 20);
@@ -108,37 +152,35 @@ void GlslplugInAudioProcessorEditor::resized()
             m_SyncButton.setVisible (true);
             m_PlayWndButton.setVisible (true);
             m_statusLabel.setVisible (true);
-            this->setSize (wndFullSizeW, wndFullSizeH);
             break;
+        }
 
         case GUIState::EditorOnly:
-            fragmentEditorComp.setBounds (0, 0, wndFullSizeW, editorBottom);
-            m_statusLabel.setBounds (0, editorBottom, wndFullSizeW, 60);
-            m_SyncModeSwitch.setBounds (glSide, editorBottom + 60, 108, 20);
-            m_SyncButton.setBounds (glSide + 108, editorBottom + 60, 170, 20);
-            m_PlayWndButton.setBounds (glSide + 278, editorBottom + 60, 170, 20);
+        {
+            const int editorBottom = height - 80;
+
+            fragmentEditorComp.setBounds (0, 0, width, editorBottom);
+            m_statusLabel.setBounds (0, editorBottom, width, 60);
+            m_SyncModeSwitch.setBounds (0, editorBottom + 60, 108, 20);
+            m_SyncButton.setBounds (108, editorBottom + 60, 170, 20);
+            m_PlayWndButton.setBounds (278, editorBottom + 60, 170, 20);
             m_GLSLCompo.setVisible (false);
             fragmentEditorComp.setVisible (true);
             m_SyncModeSwitch.setVisible (true);
             m_SyncButton.setVisible (true);
             m_PlayWndButton.setVisible (true);
             m_statusLabel.setVisible (true);
-            this->setSize (wndFullSizeW, wndFullSizeH);
             break;
+        }
 
         case GUIState::PreviewOnly:
-            fragmentEditorComp.setBounds (glSide, 0, editorSide, editorBottom);
-            m_statusLabel.setBounds (glSide, editorBottom, editorSide, 60);
-            m_SyncModeSwitch.setBounds (glSide, editorBottom + 60, 108, 20);
-            m_SyncButton.setBounds (glSide + 108, editorBottom + 60, 170, 20);
-            m_PlayWndButton.setBounds (glSide + 278, editorBottom + 60, 170, 20);
+            m_GLSLCompo.setBounds (0, 0, width, height);
             m_GLSLCompo.setVisible (true);
             fragmentEditorComp.setVisible (false);
             m_SyncModeSwitch.setVisible (false);
             m_SyncButton.setVisible (false);
             m_PlayWndButton.setVisible (false);
             m_statusLabel.setVisible (false);
-            this->setSize (glSide, glBottom);
             break;
     }
 }
@@ -146,6 +188,13 @@ void GlslplugInAudioProcessorEditor::resized()
 //==============================================================================
 void GlslplugInAudioProcessorEditor::timerCallback()
 {
+    if (commandLineInputPending && m_GLSLCompo.isInitialised)
+    {
+        commandLineInputPending = false;
+        commandLineInputAwaitingResult = true;
+        fragmentDocument.replaceAllContent (commandLineInputSource);
+    }
+
     if (isNeedShaderCompile)
     {
         isNeedShaderCompile = false;
@@ -161,6 +210,23 @@ void GlslplugInAudioProcessorEditor::timerCallback()
             setShaderSync();
 
         startTimer (20);
+    }
+
+    if (commandLineInputAwaitingResult
+        && m_GLSLCompo.isInitialised
+        && ! isNeedShaderCompile
+        && ! m_GLSLCompo.isShaderCompileReady)
+    {
+        commandLineInputAwaitingResult = false;
+
+        const bool success = m_GLSLCompo.isShaderCompileSuccess;
+        std::cout << (success ? "OK: " : "ERROR: ") << m_statusLabel.getText() << std::endl;
+
+        if (auto* app = JUCEApplicationBase::getInstance())
+        {
+            app->setApplicationReturnValue (success ? 0 : 1);
+            JUCEApplicationBase::quit();
+        }
     }
 
     // MIDI CC
@@ -188,12 +254,19 @@ void GlslplugInAudioProcessorEditor::codeDocumentTextInserted (const String& /*n
 {
     startTimer (shaderLinkDelay);
     isNeedShaderCompile = true;
+
+    // CodeEditorComponent's incremental repaint can leave stale glyphs on screen
+    // when a line shrinks (e.g. after a bulk replaceAllContent with shorter text),
+    // since it only invalidates the region covered by the new content. Force a
+    // full repaint so nothing from the previous content lingers.
+    fragmentEditorComp.repaint();
 }
 
 void GlslplugInAudioProcessorEditor::codeDocumentTextDeleted (int /*startIndex*/, int /*endIndex*/)
 {
     startTimer (shaderLinkDelay);
     isNeedShaderCompile = true;
+    fragmentEditorComp.repaint();
 }
 
 void GlslplugInAudioProcessorEditor::setMidiCCValue (juce::MidiMessage midiCC)
@@ -208,7 +281,7 @@ void GlslplugInAudioProcessorEditor::sendMidiCCValue()
         juce::MidiMessage midiCC = m_midiCCqueue.front();
         m_midiCCqueue.pop();
         if (m_GLSLCompo.isInitialised)
-            m_GLSLCompo.setMidiCCValue (midiCC.getControllerNumber(), midiCC.getControllerValue());
+            m_GLSLCompo.setMidiCCValue (midiCC.getControllerNumber(), (float) midiCC.getControllerValue());
     }
 }
 
@@ -267,7 +340,7 @@ void GlslplugInAudioProcessorEditor::sendNextWave()
     }
 }
 
-bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component* originatingComponent)
+bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component*)
 {
     //m_statusLabel.setText(m_statusLabel.getText() + "keyCode:" + String(key.getKeyCode()) + "/keyChar:" + String(key.getTextCharacter()), dontSendNotification);
 
@@ -279,11 +352,13 @@ bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component*
             {
                 case GUIState::Default:
                     m_guiState = GUIState::PreviewOnly;
+                    setSize (wndFullSizeH, wndFullSizeH);
                     break;
                 case GUIState::EditorOnly:
                     break;
                 case GUIState::PreviewOnly:
                     m_guiState = GUIState::Default;
+                    setSize (wndFullSizeW, wndFullSizeH);
                     break;
             }
             this->resized();
@@ -294,9 +369,11 @@ bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component*
             {
                 case GUIState::Default:
                     m_guiState = GUIState::EditorOnly;
+                    setSize (wndFullSizeW, wndFullSizeH);
                     break;
                 case GUIState::EditorOnly:
                     m_guiState = GUIState::Default;
+                    setSize (wndFullSizeW, wndFullSizeH);
                     break;
                 case GUIState::PreviewOnly:
                     break;
@@ -308,7 +385,7 @@ bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component*
             auto fs = fragmentEditorComp.getFont();
             if (fs.getHeight() < 52)
             {
-                fragmentEditorComp.setFont (Font (fs.getHeight() + 1.0f));
+                fragmentEditorComp.setFont (Font (FontOptions().withHeight (fs.getHeight() + 1.0f)));
             }
         }
         if (key.getKeyCode() == 45) // "-"
@@ -316,7 +393,7 @@ bool GlslplugInAudioProcessorEditor::keyPressed (const KeyPress& key, Component*
             auto fs = fragmentEditorComp.getFont();
             if (fs.getHeight() > 7)
             {
-                fragmentEditorComp.setFont (Font (fs.getHeight() - 1.0f));
+                fragmentEditorComp.setFont (Font (FontOptions().withHeight (fs.getHeight() - 1.0f)));
             }
         }
     }
@@ -336,9 +413,9 @@ void GlslplugInAudioProcessorEditor::buttonClicked (Button* _button)
     }
     if (_button->getName() == "PLAY_WND")
     {
-        if (processor.existPlayerWindow())
-            processor.deletePlayerWindow();
+        if (audioProcessor.existPlayerWindow())
+            audioProcessor.deletePlayerWindow();
         else
-            processor.createPlayerWindow();
+            audioProcessor.createPlayerWindow();
     }
 }

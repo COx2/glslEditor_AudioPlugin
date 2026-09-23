@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "PluginProcessor.h"
 
 #include <queue>
@@ -25,9 +25,11 @@ class GlslplugInAudioProcessorEditor : public AudioProcessorEditor,
 {
 public:
     GlslplugInAudioProcessorEditor (GlslplugInAudioProcessor&);
-    ~GlslplugInAudioProcessorEditor();
+    ~GlslplugInAudioProcessorEditor() override;
 
     //==============================================================================
+    using Component::keyPressed;
+
     void paint (Graphics&) override;
     void resized() override;
     void timerCallback() override;
@@ -35,7 +37,7 @@ public:
     void setShaderSync();
     void pushNextSampleIntoFifo (float sample) noexcept;
 
-    GlslplugInAudioProcessor& processor;
+    GlslplugInAudioProcessor& audioProcessor;
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -77,14 +79,22 @@ private:
     float waveData[fftSize];
 
     // KeyListener
-    //bool keyPressed(const KeyPress& key) override;
-    bool keyPressed (const KeyPress& key, Component* originatingComponent) override;
+    bool keyPressed (const KeyPress& key, Component*) override;
 
     /** Called when the button is clicked. */
     virtual void buttonClicked (Button*) override;
 
     bool isShaderSyncAuto = false;
     bool isNeedShaderCompile = false;
+
+    // -i/--input command line support: loads a fragment shader from disk, compiles
+    // it the same way a pasted-in shader would be, prints the result to the
+    // console, and quits with a 0 (success) or 1 (failure) exit code. Intended for
+    // headless/scripted testing of shader files without driving the GUI.
+    void checkForCommandLineInput();
+    String commandLineInputSource;
+    bool commandLineInputPending = false;
+    bool commandLineInputAwaitingResult = false;
 
     int wndFullSizeW = 1024;
     int wndFullSizeH = 576;

@@ -37,15 +37,8 @@ void main()
 })"));
 
 const String GLSLComponent::defaultFragmentShader = String (std::string (R"(
-#if JUCE_OPENGL_ES
-varying lowp vec4 destinationColour;
-varying lowp vec2 textureCoordOut;
-#else
 varying vec4 destinationColour;
 varying vec2 textureCoordOut;
-#endif
-
-#extension GL_OES_standard_derivatives : enable
 
 uniform float time;
 uniform vec2 mouse;
@@ -68,6 +61,13 @@ void main()
 //==============================================================================
 GLSLComponent::GLSLComponent()
 {
+    // Explicitly request a 3.2 core profile context instead of leaving it up to
+    // the platform/driver default. Without this, some drivers (observed with the
+    // NVIDIA Linux driver) hand out a compatibility-profile context reporting a much
+    // newer GLSL version, which confuses translateVertexShaderToV3()/
+    // translateFragmentShaderToV3() below and leads to shader link failures.
+    openGLContext.setPreferredVersion ({ 3, 2 });
+    openGLContext.setPreferredProfile (OpenGLContext::Profile::core);
 }
 
 GLSLComponent::~GLSLComponent()
@@ -80,7 +80,16 @@ void GLSLComponent::initialise()
     vertexShader = defaultVertexShader;
     fragmentShader = defaultFragmentShader;
 
-    if (StaticValues::getShaderCacheReady())
+    // The background quad geometry never depends on the shader source, so it only
+    // needs to be (re)built when the GL context itself is (re)created - not on every
+    // shader recompile.
+    shape.reset (new Shape (openGLContext));
+
+    // getShaderCacheReady() only means "some fragment text has been cached", not that
+    // it was ever successfully compiled - getShaderCacheVerified() is empty until a
+    // compile actually succeeds. Fall back to the known-good hardcoded default in
+    // that case, rather than attempting to compile an empty fragment shader.
+    if (StaticValues::getShaderCacheReady() && StaticValues::getShaderCacheVerified().isNotEmpty())
     {
         setShaderProgramFragment (StaticValues::getShaderCacheVerified());
         updateShader();
@@ -112,11 +121,14 @@ void GLSLComponent::render()
 
     jassert (OpenGLHelpers::isContextActive());
 
-    if (shader == nullptr)
-        return;
-
+    // Retry compiling even if the previous attempt failed (shader == nullptr) -
+    // otherwise, once a single compile fails, this component can never recover,
+    // even after the user fixes/replaces the shader source.
     if (isShaderCompileReady)
         updateShader();
+
+    if (shader == nullptr)
+        return;
 
     const float desktopScale = (float) openGLContext.getRenderingScale();
     OpenGLHelpers::clear (Colour::greyLevel (0.1f));
@@ -124,7 +136,7 @@ void GLSLComponent::render()
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glViewport (0, 0, roundToInt (desktopScale * getWidth()), roundToInt (desktopScale * getHeight()));
+    glViewport (0, 0, roundToInt (desktopScale * (float) getWidth()), roundToInt (desktopScale * (float) getHeight()));
 
     shader->use();
 
@@ -145,7 +157,7 @@ void GLSLComponent::render()
 
     if (uniforms->resolution != nullptr)
     {
-        uniforms->resolution->set (getWidth(), getHeight());
+        uniforms->resolution->set ((float) getWidth(), (float) getHeight());
     }
 
     if (uniforms->mouse != nullptr)
@@ -182,7 +194,7 @@ void GLSLComponent::render()
     /**/
 }
 
-void GLSLComponent::paint (Graphics& g)
+void GLSLComponent::paint (Graphics&)
 {
     // You can add your component specific drawing code here!
     // This will draw over the top of the openGL background.
@@ -206,10 +218,10 @@ void GLSLComponent::setFragmentDocPtr (CodeDocument* _fragmentDoc)
 }
 
 //==============================================================================
-void GLSLComponent::setShaderProgram (const String& vertexShader, const String& fragmentShader)
+void GLSLComponent::setShaderProgram (const String& _vertexShader, const String& _fragmentShader)
 {
-    newVertexShader = vertexShader;
-    newFragmentShader = fragmentShader;
+    newVertexShader = _vertexShader;
+    newFragmentShader = _fragmentShader;
     isShaderCompileReady = true;
 }
 
@@ -230,7 +242,7 @@ void GLSLComponent::setShaderProgramVertex (const String& _vertexShader)
 //==============================================================================
 void GLSLComponent::setMidiCCValue (int ccNumber, float value)
 {
-    if (ccNumber < 128)
+    if (ccNumber >= 0 && ccNumber < 128)
     {
         m_midiCC[ccNumber] = value;
 #ifdef DEBUG
@@ -246,7 +258,7 @@ void GLSLComponent::setMidiCCValue (int ccNumber, float value)
 
 void GLSLComponent::setSpectrumValue (int spectrumNumber, float value)
 {
-    if (spectrumNumber < 256)
+    if (spectrumNumber >= 0 && spectrumNumber < 256)
     {
         m_spectrum[spectrumNumber] = value;
     }
@@ -254,7 +266,7 @@ void GLSLComponent::setSpectrumValue (int spectrumNumber, float value)
 
 void GLSLComponent::setWaveValue (int waveNumber, float value)
 {
-    if (waveNumber < 256)
+    if (waveNumber >= 0 && waveNumber < 256)
     {
         m_wave[waveNumber] = value;
     }
@@ -285,7 +297,6 @@ void GLSLComponent::createShaders()
         shader = std::move (newShader);
         shader->use();
 
-        shape.reset (new Shape (openGLContext));
         attributes.reset (new Attributes (openGLContext, *shader));
         uniforms.reset (new Uniforms (openGLContext, *shader));
 
@@ -324,7 +335,6 @@ void GLSLComponent::updateShader()
             shader = std::move (newShader);
             shader->use();
 
-            shape.reset (new Shape (openGLContext));
             attributes.reset (new Attributes (openGLContext, *shader));
             uniforms.reset (new Uniforms (openGLContext, *shader));
 
@@ -350,8 +360,8 @@ void GLSLComponent::updateShader()
 
 void GLSLComponent::mouseDrag (const MouseEvent& event)
 {
-    mouseX = float (event.getPosition().getX()) / getWidth();
-    mouseY = 1.0f - float (event.getPosition().getY()) / getHeight();
+    mouseX = float (event.getPosition().getX()) / (float) getWidth();
+    mouseY = 1.0f - float (event.getPosition().getY()) / (float) getHeight();
 
     mouseX = std::min (std::max (0.0f, mouseX), 1.0f);
     mouseY = std::min (std::max (0.0f, mouseY), 1.0f);
@@ -366,8 +376,7 @@ Matrix3D<float> GLSLComponent::getProjectionMatrix() const
 
 Matrix3D<float> GLSLComponent::getViewMatrix() const
 {
-    Matrix3D<float> viewMatrix (Vector3D<float> (0.0f, 0.0f, -5.0f /*-10.0f*/));
-    Matrix3D<float> rotationMatrix = viewMatrix.rotation (Vector3D<float> (-0.3f, 5.0f * std::sin (getFrameCounter() * 0.01f), 0.0f));
+    Matrix3D<float> viewMatrix = Matrix3D<float>::fromTranslation (Vector3D<float> (0.0f, 0.0f, -5.0f /*-10.0f*/));
 
-    return /*rotationMatrix * */ viewMatrix;
+    return viewMatrix;
 }

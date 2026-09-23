@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "GLSLTypes.h"
 
 //==============================================================================
@@ -24,7 +24,7 @@ class GLSLComponent : public OpenGLAppComponent,
 public:
     //==============================================================================
     GLSLComponent();
-    ~GLSLComponent();
+    ~GLSLComponent() override;
 
     //==============================================================================
     void initialise() override;
@@ -40,7 +40,7 @@ public:
     void setFragmentDocPtr (CodeDocument* _fragmentDoc);
 
     //==============================================================================
-    void setShaderProgram (const String& vertexShader, const String& fragmentShader);
+    void setShaderProgram (const String& _vertexShader, const String& _fragmentShader);
     void setShaderProgramFragment (const String& _fragmentShader);
     void setShaderProgramVertex (const String& _vertexShader);
 
@@ -52,6 +52,11 @@ public:
     //==============================================================================
     bool isInitialised = false;
     bool isShaderCompileSuccess = false;
+
+    // True from the moment a new shader is submitted until the pending compile/link
+    // attempt has been processed by render(). Used to detect when a compile has
+    // finished (regardless of whether it succeeded or failed).
+    bool isShaderCompileReady = false;
 
     static const String defaultVertexShader;
     static const String defaultFragmentShader;
@@ -85,7 +90,6 @@ private:
     GLfloat timeCounter = 0.0f;
 
     String newVertexShader, newFragmentShader;
-    bool isShaderCompileReady = false;
     float mouseX, mouseY;
     float m_midiCC[128] = { 0 };
     float m_spectrum[256] = { 0 };

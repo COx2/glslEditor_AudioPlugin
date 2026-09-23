@@ -10,8 +10,10 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "Resources/WavefrontObjParser.h"
+
+using namespace ::juce::gl;
 
 //==============================================================================
 struct Vertex
@@ -43,7 +45,7 @@ struct Attributes
     {
         if (position != nullptr)
         {
-            openGLContext.extensions.glVertexAttribPointer (position->attributeID, 3, GL_FLOAT, GL_FALSE, sizeof (Vertex), 0);
+            openGLContext.extensions.glVertexAttribPointer (position->attributeID, 3, GL_FLOAT, GL_FALSE, sizeof (Vertex), nullptr);
             openGLContext.extensions.glEnableVertexAttribArray (position->attributeID);
         }
 
@@ -166,7 +168,7 @@ struct Shape
             vertexBuffer.bind();
 
             glAttributes.enable (openGLContext);
-            glDrawElements (GL_TRIANGLES, vertexBuffer.numIndices, GL_UNSIGNED_INT, 0);
+            glDrawElements (GL_TRIANGLES, vertexBuffer.numIndices, GL_UNSIGNED_INT, nullptr);
             glAttributes.disable (openGLContext);
         }
     }

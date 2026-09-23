@@ -61,7 +61,7 @@ void PlayerWindow::maximiseButtonPressed()
     }
 }
 
-bool PlayerWindow::keyPressed (const KeyPress& key, Component* originatingComponent)
+bool PlayerWindow::keyPressed (const KeyPress& key, Component*)
 {
     if (key.getKeyCode() == key.escapeKey)
     {
@@ -126,7 +126,7 @@ void PlayerWindow::sendMidiCCValue()
     {
         juce::MidiMessage midiCC = m_midiCCqueue.front();
         m_midiCCqueue.pop();
-        m_GLSLCompo.setMidiCCValue (midiCC.getControllerNumber(), midiCC.getControllerValue());
+        m_GLSLCompo.setMidiCCValue (midiCC.getControllerNumber(), (float) midiCC.getControllerValue());
     }
 }
 
